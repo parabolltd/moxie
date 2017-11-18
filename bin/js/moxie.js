@@ -650,191 +650,6 @@ define('moxie/core/utils/Basic', [], function() {
 	};
 });
 
-// Included from: src/javascript/core/utils/Encode.js
-
-/**
- * Encode.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/core/utils/Encode
-@public
-@static
-*/
-
-define('moxie/core/utils/Encode', [], function() {
-
-	/**
-	Encode string with UTF-8
-
-	@method utf8_encode
-	@static
-	@param {String} str String to encode
-	@return {String} UTF-8 encoded string
-	*/
-	var utf8_encode = function(str) {
-		return unescape(encodeURIComponent(str));
-	};
-	
-	/**
-	Decode UTF-8 encoded string
-
-	@method utf8_decode
-	@static
-	@param {String} str String to decode
-	@return {String} Decoded string
-	*/
-	var utf8_decode = function(str_data) {
-		return decodeURIComponent(escape(str_data));
-	};
-	
-	/**
-	Decode Base64 encoded string (uses browser's default method if available),
-	from: https://raw.github.com/kvz/phpjs/master/functions/url/base64_decode.js
-
-	@method atob
-	@static
-	@param {String} data String to decode
-	@return {String} Decoded string
-	*/
-	var atob = function(data, utf8) {
-		if (typeof(window.atob) === 'function') {
-			return utf8 ? utf8_decode(window.atob(data)) : window.atob(data);
-		}
-
-		// http://kevin.vanzonneveld.net
-		// +   original by: Tyler Akins (http://rumkin.com)
-		// +   improved by: Thunder.m
-		// +      input by: Aman Gupta
-		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// +   bugfixed by: Onno Marsman
-		// +   bugfixed by: Pellentesque Malesuada
-		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// +      input by: Brett Zamir (http://brett-zamir.me)
-		// +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
-		// *     returns 1: 'Kevin van Zonneveld'
-		// mozilla has this native
-		// - but breaks in 2.0.0.12!
-		//if (typeof this.window.atob == 'function') {
-		//    return atob(data);
-		//}
-		var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-		var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-			ac = 0,
-			dec = "",
-			tmp_arr = [];
-
-		if (!data) {
-			return data;
-		}
-
-		data += '';
-
-		do { // unpack four hexets into three octets using index points in b64
-			h1 = b64.indexOf(data.charAt(i++));
-			h2 = b64.indexOf(data.charAt(i++));
-			h3 = b64.indexOf(data.charAt(i++));
-			h4 = b64.indexOf(data.charAt(i++));
-
-			bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-
-			o1 = bits >> 16 & 0xff;
-			o2 = bits >> 8 & 0xff;
-			o3 = bits & 0xff;
-
-			if (h3 == 64) {
-				tmp_arr[ac++] = String.fromCharCode(o1);
-			} else if (h4 == 64) {
-				tmp_arr[ac++] = String.fromCharCode(o1, o2);
-			} else {
-				tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
-			}
-		} while (i < data.length);
-
-		dec = tmp_arr.join('');
-
-		return utf8 ? utf8_decode(dec) : dec;
-	};
-	
-	/**
-	Base64 encode string (uses browser's default method if available),
-	from: https://raw.github.com/kvz/phpjs/master/functions/url/base64_encode.js
-
-	@method btoa
-	@static
-	@param {String} data String to encode
-	@return {String} Base64 encoded string
-	*/
-	var btoa = function(data, utf8) {
-		if (utf8) {
-			data = utf8_encode(data);
-		}
-
-		if (typeof(window.btoa) === 'function') {
-			return window.btoa(data);
-		}
-
-		// http://kevin.vanzonneveld.net
-		// +   original by: Tyler Akins (http://rumkin.com)
-		// +   improved by: Bayron Guevara
-		// +   improved by: Thunder.m
-		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// +   bugfixed by: Pellentesque Malesuada
-		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// +   improved by: Rafał Kukawski (http://kukawski.pl)
-		// *     example 1: base64_encode('Kevin van Zonneveld');
-		// *     returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
-		// mozilla has this native
-		// - but breaks in 2.0.0.12!
-		var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-		var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-			ac = 0,
-			enc = "",
-			tmp_arr = [];
-
-		if (!data) {
-			return data;
-		}
-
-		do { // pack three octets into four hexets
-			o1 = data.charCodeAt(i++);
-			o2 = data.charCodeAt(i++);
-			o3 = data.charCodeAt(i++);
-
-			bits = o1 << 16 | o2 << 8 | o3;
-
-			h1 = bits >> 18 & 0x3f;
-			h2 = bits >> 12 & 0x3f;
-			h3 = bits >> 6 & 0x3f;
-			h4 = bits & 0x3f;
-
-			// use hexets to index into b64, and append result to encoded string
-			tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
-		} while (i < data.length);
-
-		enc = tmp_arr.join('');
-
-		var r = data.length % 3;
-
-		return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
-	};
-
-
-	return {
-		utf8_encode: utf8_encode,
-		utf8_decode: utf8_decode,
-		atob: atob,
-		btoa: btoa
-	};
-});
-
 // Included from: src/javascript/core/utils/Env.js
 
 /**
@@ -1581,10 +1396,10 @@ define("moxie/core/utils/Env", [
 	return Env;
 });
 
-// Included from: src/javascript/core/Exceptions.js
+// Included from: src/javascript/core/I18n.js
 
 /**
- * Exceptions.js
+ * I18n.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -1593,156 +1408,307 @@ define("moxie/core/utils/Env", [
  * Contributing: http://www.plupload.com/contributing
  */
 
-define('moxie/core/Exceptions', [
-	'moxie/core/utils/Basic'
+define("moxie/core/I18n", [
+	"moxie/core/utils/Basic"
 ], function(Basic) {
-	
-	function _findKey(obj, value) {
-		var key;
-		for (key in obj) {
-			if (obj[key] === value) {
-				return key;
-			}
-		}
-		return null;
-	}
+	var i18n = {};
 
 	/**
-	@class moxie/core/Exception
+	@class moxie/core/I18n
 	*/
 	return {
-		RuntimeError: (function() {
-			var namecodes = {
-				NOT_INIT_ERR: 1,
-				EXCEPTION_ERR: 3,
-				NOT_SUPPORTED_ERR: 9,
-				JS_ERR: 4
-			};
+		/**
+		 * Extends the language pack object with new items.
+		 *
+		 * @param {Object} pack Language pack items to add.
+		 * @return {Object} Extended language pack object.
+		 */
+		addI18n: function(pack) {
+			return Basic.extend(i18n, pack);
+		},
 
-			function RuntimeError(code, message) {
-				this.code = code;
-				this.name = _findKey(namecodes, code);
-				this.message = this.name + (message || ": RuntimeError " + this.code);
-			}
-			
-			Basic.extend(RuntimeError, namecodes);
-			RuntimeError.prototype = Error.prototype;
-			return RuntimeError;
-		}()),
-		
-		OperationNotAllowedException: (function() {
-			
-			function OperationNotAllowedException(code) {
-				this.code = code;
-				this.name = 'OperationNotAllowedException';
-			}
-			
-			Basic.extend(OperationNotAllowedException, {
-				NOT_ALLOWED_ERR: 1
+		/**
+		 * Translates the specified string by checking for the english string in the language pack lookup.
+		 *
+		 * @param {String} str String to look for.
+		 * @return {String} Translated string or the input string if it wasn't found.
+		 */
+		translate: function(str) {
+			return i18n[str] || str;
+		},
+
+		/**
+		 * Shortcut for translate function
+		 *
+		 * @param {String} str String to look for.
+		 * @return {String} Translated string or the input string if it wasn't found.
+		 */
+		_: function(str) {
+			return this.translate(str);
+		},
+
+		/**
+		 * Pseudo sprintf implementation - simple way to replace tokens with specified values.
+		 *
+		 * @param {String} str String with tokens
+		 * @return {String} String with replaced tokens
+		 */
+		sprintf: function(str) {
+			var args = [].slice.call(arguments, 1);
+
+			return str.replace(/%[a-z]/g, function() {
+				var value = args.shift();
+				return Basic.typeOf(value) !== 'undefined' ? value : '';
 			});
-			
-			OperationNotAllowedException.prototype = Error.prototype;
-			
-			return OperationNotAllowedException;
-		}()),
-
-		ImageError: (function() {
-			var namecodes = {
-				WRONG_FORMAT: 1,
-				MAX_RESOLUTION_ERR: 2,
-				INVALID_META_ERR: 3
-			};
-
-			function ImageError(code) {
-				this.code = code;
-				this.name = _findKey(namecodes, code);
-				this.message = this.name + ": ImageError " + this.code;
-			}
-			
-			Basic.extend(ImageError, namecodes);
-			ImageError.prototype = Error.prototype;
-
-			return ImageError;
-		}()),
-
-		FileException: (function() {
-			var namecodes = {
-				NOT_FOUND_ERR: 1,
-				SECURITY_ERR: 2,
-				ABORT_ERR: 3,
-				NOT_READABLE_ERR: 4,
-				ENCODING_ERR: 5,
-				NO_MODIFICATION_ALLOWED_ERR: 6,
-				INVALID_STATE_ERR: 7,
-				SYNTAX_ERR: 8
-			};
-
-			function FileException(code) {
-				this.code = code;
-				this.name = _findKey(namecodes, code);
-				this.message = this.name + ": FileException " + this.code;
-			}
-			
-			Basic.extend(FileException, namecodes);
-			FileException.prototype = Error.prototype;
-			return FileException;
-		}()),
-		
-		DOMException: (function() {
-			var namecodes = {
-				INDEX_SIZE_ERR: 1,
-				DOMSTRING_SIZE_ERR: 2,
-				HIERARCHY_REQUEST_ERR: 3,
-				WRONG_DOCUMENT_ERR: 4,
-				INVALID_CHARACTER_ERR: 5,
-				NO_DATA_ALLOWED_ERR: 6,
-				NO_MODIFICATION_ALLOWED_ERR: 7,
-				NOT_FOUND_ERR: 8,
-				NOT_SUPPORTED_ERR: 9,
-				INUSE_ATTRIBUTE_ERR: 10,
-				INVALID_STATE_ERR: 11,
-				SYNTAX_ERR: 12,
-				INVALID_MODIFICATION_ERR: 13,
-				NAMESPACE_ERR: 14,
-				INVALID_ACCESS_ERR: 15,
-				VALIDATION_ERR: 16,
-				TYPE_MISMATCH_ERR: 17,
-				SECURITY_ERR: 18,
-				NETWORK_ERR: 19,
-				ABORT_ERR: 20,
-				URL_MISMATCH_ERR: 21,
-				QUOTA_EXCEEDED_ERR: 22,
-				TIMEOUT_ERR: 23,
-				INVALID_NODE_TYPE_ERR: 24,
-				DATA_CLONE_ERR: 25
-			};
-
-			function DOMException(code) {
-				this.code = code;
-				this.name = _findKey(namecodes, code);
-				this.message = this.name + ": DOMException " + this.code;
-			}
-			
-			Basic.extend(DOMException, namecodes);
-			DOMException.prototype = Error.prototype;
-			return DOMException;
-		}()),
-		
-		EventException: (function() {
-			function EventException(code) {
-				this.code = code;
-				this.name = 'EventException';
-			}
-			
-			Basic.extend(EventException, {
-				UNSPECIFIED_EVENT_TYPE_ERR: 0
-			});
-			
-			EventException.prototype = Error.prototype;
-			
-			return EventException;
-		}())
+		}
 	};
+});
+
+// Included from: src/javascript/core/utils/Mime.js
+
+/**
+ * Mime.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/core/utils/Mime
+@public
+@static
+*/
+
+define("moxie/core/utils/Mime", [
+	"moxie/core/utils/Basic",
+	"moxie/core/I18n"
+], function(Basic, I18n) {
+
+	var mimeData = "" +
+		"application/msword,doc dot," +
+		"application/pdf,pdf," +
+		"application/pgp-signature,pgp," +
+		"application/postscript,ps ai eps," +
+		"application/rtf,rtf," +
+		"application/vnd.ms-excel,xls xlb xlt xla," +
+		"application/vnd.ms-powerpoint,ppt pps pot ppa," +
+		"application/zip,zip," +
+		"application/x-shockwave-flash,swf swfl," +
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.document,docx," +
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.template,dotx," +
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,xlsx," +
+		"application/vnd.openxmlformats-officedocument.presentationml.presentation,pptx," +
+		"application/vnd.openxmlformats-officedocument.presentationml.template,potx," +
+		"application/vnd.openxmlformats-officedocument.presentationml.slideshow,ppsx," +
+		"application/x-javascript,js," +
+		"application/json,json," +
+		"audio/mpeg,mp3 mpga mpega mp2," +
+		"audio/x-wav,wav," +
+		"audio/x-m4a,m4a," +
+		"audio/ogg,oga ogg," +
+		"audio/aiff,aiff aif," +
+		"audio/flac,flac," +
+		"audio/aac,aac," +
+		"audio/ac3,ac3," +
+		"audio/x-ms-wma,wma," +
+		"image/bmp,bmp," +
+		"image/gif,gif," +
+		"image/jpeg,jpg jpeg jpe," +
+		"image/photoshop,psd," +
+		"image/png,png," +
+		"image/svg+xml,svg svgz," +
+		"image/tiff,tiff tif," +
+		"text/plain,asc txt text diff log," +
+		"text/html,htm html xhtml," +
+		"text/css,css," +
+		"text/csv,csv," +
+		"text/rtf,rtf," +
+		"video/mpeg,mpeg mpg mpe m2v," +
+		"video/quicktime,qt mov," +
+		"video/mp4,mp4," +
+		"video/x-m4v,m4v," +
+		"video/x-flv,flv," +
+		"video/x-ms-wmv,wmv," +
+		"video/avi,avi," +
+		"video/webm,webm," +
+		"video/3gpp,3gpp 3gp," +
+		"video/3gpp2,3g2," +
+		"video/vnd.rn-realvideo,rv," +
+		"video/ogg,ogv," +
+		"video/x-matroska,mkv," +
+		"application/vnd.oasis.opendocument.formula-template,otf," +
+		"application/octet-stream,exe";
+
+
+	/**
+	 * Map of mimes to extensions
+	 *
+	 * @property mimes
+	 * @type {Object}
+	 */
+	var mimes = {};
+
+	/**
+	 * Map of extensions to mimes
+	 *
+	 * @property extensions
+	 * @type {Object}
+	 */
+	var extensions = {};
+
+
+	/**
+	* Parses mimeData string into a mimes and extensions lookup maps. String should have the
+	* following format:
+	*
+	* application/msword,doc dot,application/pdf,pdf, ...
+	*
+	* so mime-type followed by comma and followed by space-separated list of associated extensions,
+	* then comma again and then another mime-type, etc.
+	*
+	* If invoked externally will replace override internal lookup maps with user-provided data.
+	*
+	* @method addMimeType
+	* @param {String} mimeData
+	*/
+	var addMimeType = function (mimeData) {
+		var items = mimeData.split(/,/), i, ii, ext;
+
+		for (i = 0; i < items.length; i += 2) {
+			ext = items[i + 1].split(/ /);
+
+			// extension to mime lookup
+			for (ii = 0; ii < ext.length; ii++) {
+				mimes[ext[ii]] = items[i];
+			}
+			// mime to extension lookup
+			extensions[items[i]] = ext;
+		}
+	};
+
+
+	var extList2mimes = function (filters, addMissingExtensions) {
+		var ext, i, ii, type, mimes = [];
+
+		// convert extensions to mime types list
+		for (i = 0; i < filters.length; i++) {
+			ext = filters[i].extensions.toLowerCase().split(/\s*,\s*/);
+
+			for (ii = 0; ii < ext.length; ii++) {
+
+				// if there's an asterisk in the list, then accept attribute is not required
+				if (ext[ii] === '*') {
+					return [];
+				}
+
+				type = mimes[ext[ii]];
+
+				// future browsers should filter by extension, finally
+				if (addMissingExtensions && /^\w+$/.test(ext[ii])) {
+					mimes.push('.' + ext[ii]);
+				} else if (type && Basic.inArray(type, mimes) === -1) {
+					mimes.push(type);
+				} else if (!type) {
+					// if we have no type in our map, then accept all
+					return [];
+				}
+			}
+		}
+		return mimes;
+	};
+
+
+	var mimes2exts = function(mimes) {
+		var exts = [];
+
+		Basic.each(mimes, function(mime) {
+			mime = mime.toLowerCase();
+
+			if (mime === '*') {
+				exts = [];
+				return false;
+			}
+
+			// check if this thing looks like mime type
+			var m = mime.match(/^(\w+)\/(\*|\w+)$/);
+			if (m) {
+				if (m[2] === '*') {
+					// wildcard mime type detected
+					Basic.each(extensions, function(arr, mime) {
+						if ((new RegExp('^' + m[1] + '/')).test(mime)) {
+							[].push.apply(exts, extensions[mime]);
+						}
+					});
+				} else if (extensions[mime]) {
+					[].push.apply(exts, extensions[mime]);
+				}
+			}
+		});
+		return exts;
+	};
+
+
+	var mimes2extList = function(mimes) {
+		var accept = [], exts = [];
+
+		if (Basic.typeOf(mimes) === 'string') {
+			mimes = Basic.trim(mimes).split(/\s*,\s*/);
+		}
+
+		exts = mimes2exts(mimes);
+
+		accept.push({
+			title: I18n.translate('Files'),
+			extensions: exts.length ? exts.join(',') : '*'
+		});
+
+		return accept;
+	};
+
+	/**
+	 * Extract extension from the given filename
+	 *
+	 * @method getFileExtension
+	 * @param {String} fileName
+	 * @return {String} File extension
+	 */
+	var getFileExtension = function(fileName) {
+		var matches = fileName && fileName.match(/\.([^.]+)$/);
+		if (matches) {
+			return matches[1].toLowerCase();
+		}
+		return '';
+	};
+
+
+	/**
+	 * Get file mime-type from it's filename - will try to match the extension
+	 * against internal mime-type lookup map
+	 *
+	 * @method getFileMime
+	 * @param {String} fileName
+	 * @return File mime-type if found or an empty string if not
+	 */
+	var getFileMime = function(fileName) {
+		return mimes[getFileExtension(fileName)] || '';
+	};
+
+
+	addMimeType(mimeData);
+
+	return {
+		mimes: mimes,
+		extensions: extensions,
+		addMimeType: addMimeType,
+		extList2mimes: extList2mimes,
+		mimes2exts: mimes2exts,
+		mimes2extList: mimes2extList,
+		getFileExtension: getFileExtension,
+		getFileMime: getFileMime
+	}
 });
 
 // Included from: src/javascript/core/utils/Dom.js
@@ -1930,6 +1896,170 @@ define('moxie/core/utils/Dom', ['moxie/core/utils/Env'], function(Env) {
 		getStyle: getStyle,
 		getPos: getPos,
 		getSize: getSize
+	};
+});
+
+// Included from: src/javascript/core/Exceptions.js
+
+/**
+ * Exceptions.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+define('moxie/core/Exceptions', [
+	'moxie/core/utils/Basic'
+], function(Basic) {
+	
+	function _findKey(obj, value) {
+		var key;
+		for (key in obj) {
+			if (obj[key] === value) {
+				return key;
+			}
+		}
+		return null;
+	}
+
+	/**
+	@class moxie/core/Exception
+	*/
+	return {
+		RuntimeError: (function() {
+			var namecodes = {
+				NOT_INIT_ERR: 1,
+				EXCEPTION_ERR: 3,
+				NOT_SUPPORTED_ERR: 9,
+				JS_ERR: 4
+			};
+
+			function RuntimeError(code, message) {
+				this.code = code;
+				this.name = _findKey(namecodes, code);
+				this.message = this.name + (message || ": RuntimeError " + this.code);
+			}
+			
+			Basic.extend(RuntimeError, namecodes);
+			RuntimeError.prototype = Error.prototype;
+			return RuntimeError;
+		}()),
+		
+		OperationNotAllowedException: (function() {
+			
+			function OperationNotAllowedException(code) {
+				this.code = code;
+				this.name = 'OperationNotAllowedException';
+			}
+			
+			Basic.extend(OperationNotAllowedException, {
+				NOT_ALLOWED_ERR: 1
+			});
+			
+			OperationNotAllowedException.prototype = Error.prototype;
+			
+			return OperationNotAllowedException;
+		}()),
+
+		ImageError: (function() {
+			var namecodes = {
+				WRONG_FORMAT: 1,
+				MAX_RESOLUTION_ERR: 2,
+				INVALID_META_ERR: 3
+			};
+
+			function ImageError(code) {
+				this.code = code;
+				this.name = _findKey(namecodes, code);
+				this.message = this.name + ": ImageError " + this.code;
+			}
+			
+			Basic.extend(ImageError, namecodes);
+			ImageError.prototype = Error.prototype;
+
+			return ImageError;
+		}()),
+
+		FileException: (function() {
+			var namecodes = {
+				NOT_FOUND_ERR: 1,
+				SECURITY_ERR: 2,
+				ABORT_ERR: 3,
+				NOT_READABLE_ERR: 4,
+				ENCODING_ERR: 5,
+				NO_MODIFICATION_ALLOWED_ERR: 6,
+				INVALID_STATE_ERR: 7,
+				SYNTAX_ERR: 8
+			};
+
+			function FileException(code) {
+				this.code = code;
+				this.name = _findKey(namecodes, code);
+				this.message = this.name + ": FileException " + this.code;
+			}
+			
+			Basic.extend(FileException, namecodes);
+			FileException.prototype = Error.prototype;
+			return FileException;
+		}()),
+		
+		DOMException: (function() {
+			var namecodes = {
+				INDEX_SIZE_ERR: 1,
+				DOMSTRING_SIZE_ERR: 2,
+				HIERARCHY_REQUEST_ERR: 3,
+				WRONG_DOCUMENT_ERR: 4,
+				INVALID_CHARACTER_ERR: 5,
+				NO_DATA_ALLOWED_ERR: 6,
+				NO_MODIFICATION_ALLOWED_ERR: 7,
+				NOT_FOUND_ERR: 8,
+				NOT_SUPPORTED_ERR: 9,
+				INUSE_ATTRIBUTE_ERR: 10,
+				INVALID_STATE_ERR: 11,
+				SYNTAX_ERR: 12,
+				INVALID_MODIFICATION_ERR: 13,
+				NAMESPACE_ERR: 14,
+				INVALID_ACCESS_ERR: 15,
+				VALIDATION_ERR: 16,
+				TYPE_MISMATCH_ERR: 17,
+				SECURITY_ERR: 18,
+				NETWORK_ERR: 19,
+				ABORT_ERR: 20,
+				URL_MISMATCH_ERR: 21,
+				QUOTA_EXCEEDED_ERR: 22,
+				TIMEOUT_ERR: 23,
+				INVALID_NODE_TYPE_ERR: 24,
+				DATA_CLONE_ERR: 25
+			};
+
+			function DOMException(code) {
+				this.code = code;
+				this.name = _findKey(namecodes, code);
+				this.message = this.name + ": DOMException " + this.code;
+			}
+			
+			Basic.extend(DOMException, namecodes);
+			DOMException.prototype = Error.prototype;
+			return DOMException;
+		}()),
+		
+		EventException: (function() {
+			function EventException(code) {
+				this.code = code;
+				this.name = 'EventException';
+			}
+			
+			Basic.extend(EventException, {
+				UNSPECIFIED_EVENT_TYPE_ERR: 0
+			});
+			
+			EventException.prototype = Error.prototype;
+			
+			return EventException;
+		}())
 	};
 });
 
@@ -3098,499 +3228,6 @@ define('moxie/runtime/RuntimeClient', [
 
 });
 
-// Included from: src/javascript/file/Blob.js
-
-/**
- * Blob.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-define('moxie/file/Blob', [
-	'moxie/core/utils/Basic',
-	'moxie/core/utils/Encode',
-	'moxie/runtime/RuntimeClient'
-], function(Basic, Encode, RuntimeClient) {
-	
-	var blobpool = {};
-
-	/**
-	@class moxie/file/Blob
-	@constructor
-	@param {String} ruid Unique id of the runtime, to which this blob belongs to
-	@param {Object} blob Object "Native" blob object, as it is represented in the runtime
-	*/
-	function Blob(ruid, blob) {
-
-		function _sliceDetached(start, end, type) {
-			var blob, data = blobpool[this.uid];
-
-			if (Basic.typeOf(data) !== 'string' || !data.length) {
-				return null; // or throw exception
-			}
-
-			blob = new Blob(null, {
-				type: type,
-				size: end - start
-			});
-			blob.detach(data.substr(start, blob.size));
-
-			return blob;
-		}
-
-		RuntimeClient.call(this);
-
-		if (ruid) {	
-			this.connectRuntime(ruid);
-		}
-
-		if (!blob) {
-			blob = {};
-		} else if (Basic.typeOf(blob) === 'string') { // dataUrl or binary string
-			blob = { data: blob };
-		}
-
-		Basic.extend(this, {
-			
-			/**
-			Unique id of the component
-
-			@property uid
-			@type {String}
-			*/
-			uid: blob.uid || Basic.guid('uid_'),
-			
-			/**
-			Unique id of the connected runtime, if falsy, then runtime will have to be initialized 
-			before this Blob can be used, modified or sent
-
-			@property ruid
-			@type {String}
-			*/
-			ruid: ruid,
-	
-			/**
-			Size of blob
-
-			@property size
-			@type {Number}
-			@default 0
-			*/
-			size: blob.size || 0,
-			
-			/**
-			Mime type of blob
-
-			@property type
-			@type {String}
-			@default ''
-			*/
-			type: blob.type || '',
-			
-			/**
-			@method slice
-			@param {Number} [start=0]
-			*/
-			slice: function(start, end, type) {		
-				if (this.isDetached()) {
-					return _sliceDetached.apply(this, arguments);
-				}
-				return this.getRuntime().exec.call(this, 'Blob', 'slice', this.getSource(), start, end, type);
-			},
-
-			/**
-			Returns "native" blob object (as it is represented in connected runtime) or null if not found
-
-			@method getSource
-			@return {Blob} Returns "native" blob object or null if not found
-			*/
-			getSource: function() {
-				if (!blobpool[this.uid]) {
-					return null;	
-				}
-				return blobpool[this.uid];
-			},
-
-			/** 
-			Detaches blob from any runtime that it depends on and initialize with standalone value
-
-			@method detach
-			@protected
-			@param {DOMString} [data=''] Standalone value
-			*/
-			detach: function(data) {
-				if (this.ruid) {
-					this.getRuntime().exec.call(this, 'Blob', 'destroy');
-					this.disconnectRuntime();
-					this.ruid = null;
-				}
-
-				data = data || '';
-
-				// if dataUrl, convert to binary string
-				if (data.substr(0, 5) == 'data:') {
-					var base64Offset = data.indexOf(';base64,');
-					this.type = data.substring(5, base64Offset);
-					data = Encode.atob(data.substring(base64Offset + 8));
-				}
-
-				this.size = data.length;
-
-				blobpool[this.uid] = data;
-			},
-
-			/**
-			Checks if blob is standalone (detached of any runtime)
-			
-			@method isDetached
-			@protected
-			@return {Boolean}
-			*/
-			isDetached: function() {
-				return !this.ruid && Basic.typeOf(blobpool[this.uid]) === 'string';
-			},
-			
-			/** 
-			Destroy Blob and free any resources it was using
-
-			@method destroy
-			*/
-			destroy: function() {
-				this.detach();
-				delete blobpool[this.uid];
-			}
-		});
-
-		
-		if (blob.data) {
-			this.detach(blob.data); // auto-detach if payload has been passed
-		} else {
-			blobpool[this.uid] = blob;	
-		}
-	}
-	
-	return Blob;
-});
-
-// Included from: src/javascript/core/I18n.js
-
-/**
- * I18n.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-define("moxie/core/I18n", [
-	"moxie/core/utils/Basic"
-], function(Basic) {
-	var i18n = {};
-
-	/**
-	@class moxie/core/I18n
-	*/
-	return {
-		/**
-		 * Extends the language pack object with new items.
-		 *
-		 * @param {Object} pack Language pack items to add.
-		 * @return {Object} Extended language pack object.
-		 */
-		addI18n: function(pack) {
-			return Basic.extend(i18n, pack);
-		},
-
-		/**
-		 * Translates the specified string by checking for the english string in the language pack lookup.
-		 *
-		 * @param {String} str String to look for.
-		 * @return {String} Translated string or the input string if it wasn't found.
-		 */
-		translate: function(str) {
-			return i18n[str] || str;
-		},
-
-		/**
-		 * Shortcut for translate function
-		 *
-		 * @param {String} str String to look for.
-		 * @return {String} Translated string or the input string if it wasn't found.
-		 */
-		_: function(str) {
-			return this.translate(str);
-		},
-
-		/**
-		 * Pseudo sprintf implementation - simple way to replace tokens with specified values.
-		 *
-		 * @param {String} str String with tokens
-		 * @return {String} String with replaced tokens
-		 */
-		sprintf: function(str) {
-			var args = [].slice.call(arguments, 1);
-
-			return str.replace(/%[a-z]/g, function() {
-				var value = args.shift();
-				return Basic.typeOf(value) !== 'undefined' ? value : '';
-			});
-		}
-	};
-});
-
-// Included from: src/javascript/core/utils/Mime.js
-
-/**
- * Mime.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/core/utils/Mime
-@public
-@static
-*/
-
-define("moxie/core/utils/Mime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/I18n"
-], function(Basic, I18n) {
-
-	var mimeData = "" +
-		"application/msword,doc dot," +
-		"application/pdf,pdf," +
-		"application/pgp-signature,pgp," +
-		"application/postscript,ps ai eps," +
-		"application/rtf,rtf," +
-		"application/vnd.ms-excel,xls xlb xlt xla," +
-		"application/vnd.ms-powerpoint,ppt pps pot ppa," +
-		"application/zip,zip," +
-		"application/x-shockwave-flash,swf swfl," +
-		"application/vnd.openxmlformats-officedocument.wordprocessingml.document,docx," +
-		"application/vnd.openxmlformats-officedocument.wordprocessingml.template,dotx," +
-		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,xlsx," +
-		"application/vnd.openxmlformats-officedocument.presentationml.presentation,pptx," +
-		"application/vnd.openxmlformats-officedocument.presentationml.template,potx," +
-		"application/vnd.openxmlformats-officedocument.presentationml.slideshow,ppsx," +
-		"application/x-javascript,js," +
-		"application/json,json," +
-		"audio/mpeg,mp3 mpga mpega mp2," +
-		"audio/x-wav,wav," +
-		"audio/x-m4a,m4a," +
-		"audio/ogg,oga ogg," +
-		"audio/aiff,aiff aif," +
-		"audio/flac,flac," +
-		"audio/aac,aac," +
-		"audio/ac3,ac3," +
-		"audio/x-ms-wma,wma," +
-		"image/bmp,bmp," +
-		"image/gif,gif," +
-		"image/jpeg,jpg jpeg jpe," +
-		"image/photoshop,psd," +
-		"image/png,png," +
-		"image/svg+xml,svg svgz," +
-		"image/tiff,tiff tif," +
-		"text/plain,asc txt text diff log," +
-		"text/html,htm html xhtml," +
-		"text/css,css," +
-		"text/csv,csv," +
-		"text/rtf,rtf," +
-		"video/mpeg,mpeg mpg mpe m2v," +
-		"video/quicktime,qt mov," +
-		"video/mp4,mp4," +
-		"video/x-m4v,m4v," +
-		"video/x-flv,flv," +
-		"video/x-ms-wmv,wmv," +
-		"video/avi,avi," +
-		"video/webm,webm," +
-		"video/3gpp,3gpp 3gp," +
-		"video/3gpp2,3g2," +
-		"video/vnd.rn-realvideo,rv," +
-		"video/ogg,ogv," +
-		"video/x-matroska,mkv," +
-		"application/vnd.oasis.opendocument.formula-template,otf," +
-		"application/octet-stream,exe";
-
-
-	/**
-	 * Map of mimes to extensions
-	 *
-	 * @property mimes
-	 * @type {Object}
-	 */
-	var mimes = {};
-
-	/**
-	 * Map of extensions to mimes
-	 *
-	 * @property extensions
-	 * @type {Object}
-	 */
-	var extensions = {};
-
-
-	/**
-	* Parses mimeData string into a mimes and extensions lookup maps. String should have the
-	* following format:
-	*
-	* application/msword,doc dot,application/pdf,pdf, ...
-	*
-	* so mime-type followed by comma and followed by space-separated list of associated extensions,
-	* then comma again and then another mime-type, etc.
-	*
-	* If invoked externally will replace override internal lookup maps with user-provided data.
-	*
-	* @method addMimeType
-	* @param {String} mimeData
-	*/
-	var addMimeType = function (mimeData) {
-		var items = mimeData.split(/,/), i, ii, ext;
-
-		for (i = 0; i < items.length; i += 2) {
-			ext = items[i + 1].split(/ /);
-
-			// extension to mime lookup
-			for (ii = 0; ii < ext.length; ii++) {
-				mimes[ext[ii]] = items[i];
-			}
-			// mime to extension lookup
-			extensions[items[i]] = ext;
-		}
-	};
-
-
-	var extList2mimes = function (filters, addMissingExtensions) {
-		var ext, i, ii, type, mimes = [];
-
-		// convert extensions to mime types list
-		for (i = 0; i < filters.length; i++) {
-			ext = filters[i].extensions.toLowerCase().split(/\s*,\s*/);
-
-			for (ii = 0; ii < ext.length; ii++) {
-
-				// if there's an asterisk in the list, then accept attribute is not required
-				if (ext[ii] === '*') {
-					return [];
-				}
-
-				type = mimes[ext[ii]];
-
-				// future browsers should filter by extension, finally
-				if (addMissingExtensions && /^\w+$/.test(ext[ii])) {
-					mimes.push('.' + ext[ii]);
-				} else if (type && Basic.inArray(type, mimes) === -1) {
-					mimes.push(type);
-				} else if (!type) {
-					// if we have no type in our map, then accept all
-					return [];
-				}
-			}
-		}
-		return mimes;
-	};
-
-
-	var mimes2exts = function(mimes) {
-		var exts = [];
-
-		Basic.each(mimes, function(mime) {
-			mime = mime.toLowerCase();
-
-			if (mime === '*') {
-				exts = [];
-				return false;
-			}
-
-			// check if this thing looks like mime type
-			var m = mime.match(/^(\w+)\/(\*|\w+)$/);
-			if (m) {
-				if (m[2] === '*') {
-					// wildcard mime type detected
-					Basic.each(extensions, function(arr, mime) {
-						if ((new RegExp('^' + m[1] + '/')).test(mime)) {
-							[].push.apply(exts, extensions[mime]);
-						}
-					});
-				} else if (extensions[mime]) {
-					[].push.apply(exts, extensions[mime]);
-				}
-			}
-		});
-		return exts;
-	};
-
-
-	var mimes2extList = function(mimes) {
-		var accept = [], exts = [];
-
-		if (Basic.typeOf(mimes) === 'string') {
-			mimes = Basic.trim(mimes).split(/\s*,\s*/);
-		}
-
-		exts = mimes2exts(mimes);
-
-		accept.push({
-			title: I18n.translate('Files'),
-			extensions: exts.length ? exts.join(',') : '*'
-		});
-
-		return accept;
-	};
-
-	/**
-	 * Extract extension from the given filename
-	 *
-	 * @method getFileExtension
-	 * @param {String} fileName
-	 * @return {String} File extension
-	 */
-	var getFileExtension = function(fileName) {
-		var matches = fileName && fileName.match(/\.([^.]+)$/);
-		if (matches) {
-			return matches[1].toLowerCase();
-		}
-		return '';
-	};
-
-
-	/**
-	 * Get file mime-type from it's filename - will try to match the extension
-	 * against internal mime-type lookup map
-	 *
-	 * @method getFileMime
-	 * @param {String} fileName
-	 * @return File mime-type if found or an empty string if not
-	 */
-	var getFileMime = function(fileName) {
-		return mimes[getFileExtension(fileName)] || '';
-	};
-
-
-	addMimeType(mimeData);
-
-	return {
-		mimes: mimes,
-		extensions: extensions,
-		addMimeType: addMimeType,
-		extList2mimes: extList2mimes,
-		mimes2exts: mimes2exts,
-		mimes2extList: mimes2extList,
-		getFileExtension: getFileExtension,
-		getFileMime: getFileMime
-	}
-});
-
 // Included from: src/javascript/file/FileInput.js
 
 /**
@@ -3964,6 +3601,369 @@ define('moxie/file/FileInput', [
 	FileInput.prototype = EventTarget.instance;
 
 	return FileInput;
+});
+
+// Included from: src/javascript/core/utils/Encode.js
+
+/**
+ * Encode.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/core/utils/Encode
+@public
+@static
+*/
+
+define('moxie/core/utils/Encode', [], function() {
+
+	/**
+	Encode string with UTF-8
+
+	@method utf8_encode
+	@static
+	@param {String} str String to encode
+	@return {String} UTF-8 encoded string
+	*/
+	var utf8_encode = function(str) {
+		return unescape(encodeURIComponent(str));
+	};
+	
+	/**
+	Decode UTF-8 encoded string
+
+	@method utf8_decode
+	@static
+	@param {String} str String to decode
+	@return {String} Decoded string
+	*/
+	var utf8_decode = function(str_data) {
+		return decodeURIComponent(escape(str_data));
+	};
+	
+	/**
+	Decode Base64 encoded string (uses browser's default method if available),
+	from: https://raw.github.com/kvz/phpjs/master/functions/url/base64_decode.js
+
+	@method atob
+	@static
+	@param {String} data String to decode
+	@return {String} Decoded string
+	*/
+	var atob = function(data, utf8) {
+		if (typeof(window.atob) === 'function') {
+			return utf8 ? utf8_decode(window.atob(data)) : window.atob(data);
+		}
+
+		// http://kevin.vanzonneveld.net
+		// +   original by: Tyler Akins (http://rumkin.com)
+		// +   improved by: Thunder.m
+		// +      input by: Aman Gupta
+		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// +   bugfixed by: Onno Marsman
+		// +   bugfixed by: Pellentesque Malesuada
+		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// +      input by: Brett Zamir (http://brett-zamir.me)
+		// +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
+		// *     returns 1: 'Kevin van Zonneveld'
+		// mozilla has this native
+		// - but breaks in 2.0.0.12!
+		//if (typeof this.window.atob == 'function') {
+		//    return atob(data);
+		//}
+		var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+		var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+			ac = 0,
+			dec = "",
+			tmp_arr = [];
+
+		if (!data) {
+			return data;
+		}
+
+		data += '';
+
+		do { // unpack four hexets into three octets using index points in b64
+			h1 = b64.indexOf(data.charAt(i++));
+			h2 = b64.indexOf(data.charAt(i++));
+			h3 = b64.indexOf(data.charAt(i++));
+			h4 = b64.indexOf(data.charAt(i++));
+
+			bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+			o1 = bits >> 16 & 0xff;
+			o2 = bits >> 8 & 0xff;
+			o3 = bits & 0xff;
+
+			if (h3 == 64) {
+				tmp_arr[ac++] = String.fromCharCode(o1);
+			} else if (h4 == 64) {
+				tmp_arr[ac++] = String.fromCharCode(o1, o2);
+			} else {
+				tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
+			}
+		} while (i < data.length);
+
+		dec = tmp_arr.join('');
+
+		return utf8 ? utf8_decode(dec) : dec;
+	};
+	
+	/**
+	Base64 encode string (uses browser's default method if available),
+	from: https://raw.github.com/kvz/phpjs/master/functions/url/base64_encode.js
+
+	@method btoa
+	@static
+	@param {String} data String to encode
+	@return {String} Base64 encoded string
+	*/
+	var btoa = function(data, utf8) {
+		if (utf8) {
+			data = utf8_encode(data);
+		}
+
+		if (typeof(window.btoa) === 'function') {
+			return window.btoa(data);
+		}
+
+		// http://kevin.vanzonneveld.net
+		// +   original by: Tyler Akins (http://rumkin.com)
+		// +   improved by: Bayron Guevara
+		// +   improved by: Thunder.m
+		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// +   bugfixed by: Pellentesque Malesuada
+		// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// +   improved by: Rafał Kukawski (http://kukawski.pl)
+		// *     example 1: base64_encode('Kevin van Zonneveld');
+		// *     returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
+		// mozilla has this native
+		// - but breaks in 2.0.0.12!
+		var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+		var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+			ac = 0,
+			enc = "",
+			tmp_arr = [];
+
+		if (!data) {
+			return data;
+		}
+
+		do { // pack three octets into four hexets
+			o1 = data.charCodeAt(i++);
+			o2 = data.charCodeAt(i++);
+			o3 = data.charCodeAt(i++);
+
+			bits = o1 << 16 | o2 << 8 | o3;
+
+			h1 = bits >> 18 & 0x3f;
+			h2 = bits >> 12 & 0x3f;
+			h3 = bits >> 6 & 0x3f;
+			h4 = bits & 0x3f;
+
+			// use hexets to index into b64, and append result to encoded string
+			tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
+		} while (i < data.length);
+
+		enc = tmp_arr.join('');
+
+		var r = data.length % 3;
+
+		return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
+	};
+
+
+	return {
+		utf8_encode: utf8_encode,
+		utf8_decode: utf8_decode,
+		atob: atob,
+		btoa: btoa
+	};
+});
+
+// Included from: src/javascript/file/Blob.js
+
+/**
+ * Blob.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+define('moxie/file/Blob', [
+	'moxie/core/utils/Basic',
+	'moxie/core/utils/Encode',
+	'moxie/runtime/RuntimeClient'
+], function(Basic, Encode, RuntimeClient) {
+	
+	var blobpool = {};
+
+	/**
+	@class moxie/file/Blob
+	@constructor
+	@param {String} ruid Unique id of the runtime, to which this blob belongs to
+	@param {Object} blob Object "Native" blob object, as it is represented in the runtime
+	*/
+	function Blob(ruid, blob) {
+
+		function _sliceDetached(start, end, type) {
+			var blob, data = blobpool[this.uid];
+
+			if (Basic.typeOf(data) !== 'string' || !data.length) {
+				return null; // or throw exception
+			}
+
+			blob = new Blob(null, {
+				type: type,
+				size: end - start
+			});
+			blob.detach(data.substr(start, blob.size));
+
+			return blob;
+		}
+
+		RuntimeClient.call(this);
+
+		if (ruid) {	
+			this.connectRuntime(ruid);
+		}
+
+		if (!blob) {
+			blob = {};
+		} else if (Basic.typeOf(blob) === 'string') { // dataUrl or binary string
+			blob = { data: blob };
+		}
+
+		Basic.extend(this, {
+			
+			/**
+			Unique id of the component
+
+			@property uid
+			@type {String}
+			*/
+			uid: blob.uid || Basic.guid('uid_'),
+			
+			/**
+			Unique id of the connected runtime, if falsy, then runtime will have to be initialized 
+			before this Blob can be used, modified or sent
+
+			@property ruid
+			@type {String}
+			*/
+			ruid: ruid,
+	
+			/**
+			Size of blob
+
+			@property size
+			@type {Number}
+			@default 0
+			*/
+			size: blob.size || 0,
+			
+			/**
+			Mime type of blob
+
+			@property type
+			@type {String}
+			@default ''
+			*/
+			type: blob.type || '',
+			
+			/**
+			@method slice
+			@param {Number} [start=0]
+			*/
+			slice: function(start, end, type) {		
+				if (this.isDetached()) {
+					return _sliceDetached.apply(this, arguments);
+				}
+				return this.getRuntime().exec.call(this, 'Blob', 'slice', this.getSource(), start, end, type);
+			},
+
+			/**
+			Returns "native" blob object (as it is represented in connected runtime) or null if not found
+
+			@method getSource
+			@return {Blob} Returns "native" blob object or null if not found
+			*/
+			getSource: function() {
+				if (!blobpool[this.uid]) {
+					return null;	
+				}
+				return blobpool[this.uid];
+			},
+
+			/** 
+			Detaches blob from any runtime that it depends on and initialize with standalone value
+
+			@method detach
+			@protected
+			@param {DOMString} [data=''] Standalone value
+			*/
+			detach: function(data) {
+				if (this.ruid) {
+					this.getRuntime().exec.call(this, 'Blob', 'destroy');
+					this.disconnectRuntime();
+					this.ruid = null;
+				}
+
+				data = data || '';
+
+				// if dataUrl, convert to binary string
+				if (data.substr(0, 5) == 'data:') {
+					var base64Offset = data.indexOf(';base64,');
+					this.type = data.substring(5, base64Offset);
+					data = Encode.atob(data.substring(base64Offset + 8));
+				}
+
+				this.size = data.length;
+
+				blobpool[this.uid] = data;
+			},
+
+			/**
+			Checks if blob is standalone (detached of any runtime)
+			
+			@method isDetached
+			@protected
+			@return {Boolean}
+			*/
+			isDetached: function() {
+				return !this.ruid && Basic.typeOf(blobpool[this.uid]) === 'string';
+			},
+			
+			/** 
+			Destroy Blob and free any resources it was using
+
+			@method destroy
+			*/
+			destroy: function() {
+				this.detach();
+				delete blobpool[this.uid];
+			}
+		});
+
+		
+		if (blob.data) {
+			this.detach(blob.data); // auto-detach if payload has been passed
+		} else {
+			blobpool[this.uid] = blob;	
+		}
+	}
+	
+	return Blob;
 });
 
 // Included from: src/javascript/file/File.js
@@ -4502,6 +4502,79 @@ define('moxie/file/FileReader', [
 	return FileReader;
 });
 
+// Included from: src/javascript/file/FileReaderSync.js
+
+/**
+ * FileReaderSync.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+define('moxie/file/FileReaderSync', [
+	'moxie/core/utils/Basic',
+	'moxie/runtime/RuntimeClient',
+	'moxie/core/utils/Encode'
+], function(Basic, RuntimeClient, Encode) {
+	/**
+	Synchronous FileReader implementation. Something like this is available in WebWorkers environment, here
+	it can be used to read only preloaded blobs/files and only below certain size (not yet sure what that'd be,
+	but probably < 1mb). Not meant to be used directly by user.
+
+	@class moxie/file/FileReaderSync
+	@private
+	@constructor
+	*/
+	return function() {
+		RuntimeClient.call(this);
+
+		Basic.extend(this, {
+			uid: Basic.guid('uid_'),
+
+			readAsBinaryString: function(blob) {
+				return _read.call(this, 'readAsBinaryString', blob);
+			},
+			
+			readAsDataURL: function(blob) {
+				return _read.call(this, 'readAsDataURL', blob);
+			},
+			
+			/*readAsArrayBuffer: function(blob) {
+				return _read.call(this, 'readAsArrayBuffer', blob);
+			},*/
+			
+			readAsText: function(blob) {
+				return _read.call(this, 'readAsText', blob);
+			}
+		});
+
+		function _read(op, blob) {
+			if (blob.isDetached()) {
+				var src = blob.getSource();
+				switch (op) {
+					case 'readAsBinaryString':
+						return src;
+					case 'readAsDataURL':
+						return 'data:' + blob.type + ';base64,' + Encode.btoa(src);
+					case 'readAsText':
+						var txt = '';
+						for (var i = 0, length = src.length; i < length; i++) {
+							txt += String.fromCharCode(src[i]);
+						}
+						return txt;
+				}
+			} else {
+				var result = this.connectRuntime(blob.ruid).exec.call(this, 'FileReaderSync', 'read', op, blob);
+				this.disconnectRuntime();
+				return result;
+			}
+		}
+	};
+});
+
 // Included from: src/javascript/core/utils/Url.js
 
 /**
@@ -4689,79 +4762,6 @@ define('moxie/runtime/RuntimeTarget', [
 	RuntimeTarget.prototype = EventTarget.instance;
 
 	return RuntimeTarget;
-});
-
-// Included from: src/javascript/file/FileReaderSync.js
-
-/**
- * FileReaderSync.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-define('moxie/file/FileReaderSync', [
-	'moxie/core/utils/Basic',
-	'moxie/runtime/RuntimeClient',
-	'moxie/core/utils/Encode'
-], function(Basic, RuntimeClient, Encode) {
-	/**
-	Synchronous FileReader implementation. Something like this is available in WebWorkers environment, here
-	it can be used to read only preloaded blobs/files and only below certain size (not yet sure what that'd be,
-	but probably < 1mb). Not meant to be used directly by user.
-
-	@class moxie/file/FileReaderSync
-	@private
-	@constructor
-	*/
-	return function() {
-		RuntimeClient.call(this);
-
-		Basic.extend(this, {
-			uid: Basic.guid('uid_'),
-
-			readAsBinaryString: function(blob) {
-				return _read.call(this, 'readAsBinaryString', blob);
-			},
-			
-			readAsDataURL: function(blob) {
-				return _read.call(this, 'readAsDataURL', blob);
-			},
-			
-			/*readAsArrayBuffer: function(blob) {
-				return _read.call(this, 'readAsArrayBuffer', blob);
-			},*/
-			
-			readAsText: function(blob) {
-				return _read.call(this, 'readAsText', blob);
-			}
-		});
-
-		function _read(op, blob) {
-			if (blob.isDetached()) {
-				var src = blob.getSource();
-				switch (op) {
-					case 'readAsBinaryString':
-						return src;
-					case 'readAsDataURL':
-						return 'data:' + blob.type + ';base64,' + Encode.btoa(src);
-					case 'readAsText':
-						var txt = '';
-						for (var i = 0, length = src.length; i < length; i++) {
-							txt += String.fromCharCode(src[i]);
-						}
-						return txt;
-				}
-			} else {
-				var result = this.connectRuntime(blob.ruid).exec.call(this, 'FileReaderSync', 'read', op, blob);
-				this.disconnectRuntime();
-				return result;
-			}
-		}
-	};
 });
 
 // Included from: src/javascript/xhr/FormData.js
@@ -6822,8 +6822,9 @@ define("moxie/runtime/html5/Runtime", [
 					return !(
 						(Env.browser === 'Chrome' && Env.verComp(Env.version, 28, '<')) || 
 						(Env.browser === 'IE' && Env.verComp(Env.version, 10, '<')) || 
-						(Env.browser === 'Safari' && Env.verComp(Env.version, 7, '<')) ||
-						(Env.browser === 'Firefox' && Env.verComp(Env.version, 37, '<'))
+						(Env.browser === 'Safari' && Env.verComp(Env.version, 11, '<=')) ||
+						(Env.browser === 'Firefox' && Env.verComp(Env.version, 37, '<')) ||
+						Env.os === 'iOS' // as of iOS11, no extensions support in accept attribute
 					);
 				}()),
 				return_response_headers: True,
@@ -6898,59 +6899,6 @@ define("moxie/runtime/html5/Runtime", [
 	Runtime.addConstructor(type, Html5Runtime);
 
 	return extensions;
-});
-
-// Included from: src/javascript/runtime/html5/file/Blob.js
-
-/**
- * Blob.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/html5/file/Blob
-@private
-*/
-define("moxie/runtime/html5/file/Blob", [
-	"moxie/runtime/html5/Runtime",
-	"moxie/file/Blob"
-], function(extensions, Blob) {
-
-	function HTML5Blob() {
-		function w3cBlobSlice(blob, start, end) {
-			var blobSlice;
-
-			if (window.File.prototype.slice) {
-				try {
-					blob.slice();	// depricated version will throw WRONG_ARGUMENTS_ERR exception
-					return blob.slice(start, end);
-				} catch (e) {
-					// depricated slice method
-					return blob.slice(start, end - start);
-				}
-			// slice method got prefixed: https://bugzilla.mozilla.org/show_bug.cgi?id=649672
-			} else if ((blobSlice = window.File.prototype.webkitSlice || window.File.prototype.mozSlice)) {
-				return blobSlice.call(blob, start, end);
-			} else {
-				return null; // or throw some exception
-			}
-		}
-
-		this.slice = function() {
-			return new Blob(this.getRuntime().uid, w3cBlobSlice.apply(this, arguments));
-		};
-
-		this.destroy = function() {
-			this.getRuntime().getShim().removeInstance(this.uid);
-		};
-	}
-
-	return (extensions.Blob = HTML5Blob);
 });
 
 // Included from: src/javascript/core/utils/Events.js
@@ -7643,385 +7591,6 @@ define("moxie/runtime/html5/file/FileReader", [
 	}
 
 	return (extensions.FileReader = FileReader);
-});
-
-// Included from: src/javascript/runtime/html5/xhr/XMLHttpRequest.js
-
-/**
- * XMLHttpRequest.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/*global ActiveXObject:true */
-
-/**
-@class moxie/runtime/html5/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/html5/xhr/XMLHttpRequest", [
-	"moxie/runtime/html5/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Mime",
-	"moxie/core/utils/Url",
-	"moxie/file/File",
-	"moxie/file/Blob",
-	"moxie/xhr/FormData",
-	"moxie/core/Exceptions",
-	"moxie/core/utils/Env"
-], function(extensions, Basic, Mime, Url, File, Blob, FormData, x, Env) {
-	
-	function XMLHttpRequest() {
-		var self = this
-		, _xhr
-		, _filename
-		;
-
-		Basic.extend(this, {
-			send: function(meta, data) {
-				var target = this
-				, isGecko2_5_6 = (Env.browser === 'Mozilla' && Env.verComp(Env.version, 4, '>=') && Env.verComp(Env.version, 7, '<'))
-				, isAndroidBrowser = Env.browser === 'Android Browser'
-				, mustSendAsBinary = false
-				;
-
-				// extract file name
-				_filename = meta.url.replace(/^.+?\/([\w\-\.]+)$/, '$1').toLowerCase();
-
-				_xhr = _getNativeXHR();
-				_xhr.open(meta.method, meta.url, meta.async, meta.user, meta.password);
-
-
-				// prepare data to be sent
-				if (data instanceof Blob) {
-					if (data.isDetached()) {
-						mustSendAsBinary = true;
-					}
-					data = data.getSource();
-				} else if (data instanceof FormData) {
-
-					if (data.hasBlob()) {
-						if (data.getBlob().isDetached()) {
-							data = _prepareMultipart.call(target, data); // _xhr must be instantiated and be in OPENED state
-							mustSendAsBinary = true;
-						} else if ((isGecko2_5_6 || isAndroidBrowser) && Basic.typeOf(data.getBlob().getSource()) === 'blob' && window.FileReader) {
-							// Gecko 2/5/6 can't send blob in FormData: https://bugzilla.mozilla.org/show_bug.cgi?id=649150
-							// Android browsers (default one and Dolphin) seem to have the same issue, see: #613
-							_preloadAndSend.call(target, meta, data);
-							return; // _preloadAndSend will reinvoke send() with transmutated FormData =%D
-						}	
-					}
-
-					// transfer fields to real FormData
-					if (data instanceof FormData) { // if still a FormData, e.g. not mangled by _prepareMultipart()
-						var fd = new window.FormData();
-						data.each(function(value, name) {
-							if (value instanceof Blob) {
-								fd.append(name, value.getSource());
-							} else {
-								fd.append(name, value);
-							}
-						});
-						data = fd;
-					}
-				}
-
-
-				// if XHR L2
-				if (_xhr.upload) {
-					if (meta.withCredentials) {
-						_xhr.withCredentials = true;
-					}
-
-					_xhr.addEventListener('load', function(e) {
-						target.trigger(e);
-					});
-
-					_xhr.addEventListener('error', function(e) {
-						target.trigger(e);
-					});
-
-					// additionally listen to progress events
-					_xhr.addEventListener('progress', function(e) {
-						target.trigger(e);
-					});
-
-					_xhr.upload.addEventListener('progress', function(e) {
-						target.trigger({
-							type: 'UploadProgress',
-							loaded: e.loaded,
-							total: e.total
-						});
-					});
-				// ... otherwise simulate XHR L2
-				} else {
-					_xhr.onreadystatechange = function onReadyStateChange() {
-						
-						// fake Level 2 events
-						switch (_xhr.readyState) {
-							
-							case 1: // XMLHttpRequest.OPENED
-								// readystatechanged is fired twice for OPENED state (in IE and Mozilla) - neu
-								break;
-							
-							// looks like HEADERS_RECEIVED (state 2) is not reported in Opera (or it's old versions) - neu
-							case 2: // XMLHttpRequest.HEADERS_RECEIVED
-								break;
-								
-							case 3: // XMLHttpRequest.LOADING 
-								// try to fire progress event for not XHR L2
-								var total, loaded;
-								
-								try {
-									if (Url.hasSameOrigin(meta.url)) { // Content-Length not accessible for cross-domain on some browsers
-										total = _xhr.getResponseHeader('Content-Length') || 0; // old Safari throws an exception here
-									}
-
-									if (_xhr.responseText) { // responseText was introduced in IE7
-										loaded = _xhr.responseText.length;
-									}
-								} catch(ex) {
-									total = loaded = 0;
-								}
-
-								target.trigger({
-									type: 'progress',
-									lengthComputable: !!total,
-									total: parseInt(total, 10),
-									loaded: loaded
-								});
-								break;
-								
-							case 4: // XMLHttpRequest.DONE
-								// release readystatechange handler (mostly for IE)
-								_xhr.onreadystatechange = function() {};
-
-								// usually status 0 is returned when server is unreachable, but FF also fails to status 0 for 408 timeout
-								try {
-									if (_xhr.status >= 200 && _xhr.status < 400) {
-										target.trigger('load');
-										break;
-									}
-								} catch(ex) {}
-
-								target.trigger('error');
-								break;
-						}
-					};
-				}
-				
-
-				// set request headers
-				if (!Basic.isEmptyObj(meta.headers)) {
-					Basic.each(meta.headers, function(value, header) {
-						_xhr.setRequestHeader(header, value);
-					});
-				}
-
-				// request response type
-				if ("" !== meta.responseType && 'responseType' in _xhr) {
-					if ('json' === meta.responseType && !Env.can('return_response_type', 'json')) { // we can fake this one
-						_xhr.responseType = 'text';
-					} else {
-						_xhr.responseType = meta.responseType;
-					}
-				}
-
-				// send ...
-				if (!mustSendAsBinary) {
-					_xhr.send(data);
-				} else {
-					if (_xhr.sendAsBinary) { // Gecko
-						_xhr.sendAsBinary(data);
-					} else { // other browsers having support for typed arrays
-						(function() {
-							// mimic Gecko's sendAsBinary
-							var ui8a = new Uint8Array(data.length);
-							for (var i = 0; i < data.length; i++) {
-								ui8a[i] = (data.charCodeAt(i) & 0xff);
-							}
-							_xhr.send(ui8a.buffer);
-						}());
-					}
-				}
-
-				target.trigger('loadstart');
-			},
-
-			getStatus: function() {
-				// according to W3C spec it should return 0 for readyState < 3, but instead it throws an exception
-				try {
-					if (_xhr) {
-						return _xhr.status;
-					}
-				} catch(ex) {}
-				return 0;
-			},
-
-			getResponse: function(responseType) {
-				var I = this.getRuntime();
-
-				try {
-					switch (responseType) {
-						case 'blob':
-							var file = new File(I.uid, _xhr.response);
-							
-							// try to extract file name from content-disposition if possible (might be - not, if CORS for example)	
-							var disposition = _xhr.getResponseHeader('Content-Disposition');
-							if (disposition) {
-								// extract filename from response header if available
-								var match = disposition.match(/filename=([\'\"'])([^\1]+)\1/);
-								if (match) {
-									_filename = match[2];
-								}
-							}
-							file.name = _filename;
-
-							// pre-webkit Opera doesn't set type property on the blob response
-							if (!file.type) {
-								file.type = Mime.getFileMime(_filename);
-							}
-							return file;
-
-						case 'json':
-							if (!Env.can('return_response_type', 'json')) {
-								return _xhr.status === 200 && !!window.JSON ? JSON.parse(_xhr.responseText) : null;
-							}
-							return _xhr.response;
-
-						case 'document':
-							return _getDocument(_xhr);
-
-						default:
-							return _xhr.responseText !== '' ? _xhr.responseText : null; // against the specs, but for consistency across the runtimes
-					}
-				} catch(ex) {
-					return null;
-				}				
-			},
-
-			getAllResponseHeaders: function() {
-				try {
-					return _xhr.getAllResponseHeaders();
-				} catch(ex) {}
-				return '';
-			},
-
-			abort: function() {
-				if (_xhr) {
-					_xhr.abort();
-				}
-			},
-
-			destroy: function() {
-				self = _filename = null;
-				this.getRuntime().getShim().removeInstance(this.uid);
-			}
-		});
-
-
-		// here we go... ugly fix for ugly bug
-		function _preloadAndSend(meta, data) {
-			var target = this, blob, fr;
-				
-			// get original blob
-			blob = data.getBlob().getSource();
-			
-			// preload blob in memory to be sent as binary string
-			fr = new window.FileReader();
-			fr.onload = function() {
-				// overwrite original blob
-				data.append(data.getBlobName(), new Blob(null, {
-					type: blob.type,
-					data: fr.result
-				}));
-				// invoke send operation again
-				self.send.call(target, meta, data);
-			};
-			fr.readAsBinaryString(blob);
-		}
-
-		
-		function _getNativeXHR() {
-			if (window.XMLHttpRequest && !(Env.browser === 'IE' && Env.verComp(Env.version, 8, '<'))) { // IE7 has native XHR but it's buggy
-				return new window.XMLHttpRequest();
-			} else {
-				return (function() {
-					var progIDs = ['Msxml2.XMLHTTP.6.0', 'Microsoft.XMLHTTP']; // if 6.0 available, use it, otherwise failback to default 3.0
-					for (var i = 0; i < progIDs.length; i++) {
-						try {
-							return new ActiveXObject(progIDs[i]);
-						} catch (ex) {}
-					}
-				})();
-			}
-		}
-		
-		// @credits Sergey Ilinsky	(http://www.ilinsky.com/)
-		function _getDocument(xhr) {
-			var rXML = xhr.responseXML;
-			var rText = xhr.responseText;
-			
-			// Try parsing responseText (@see: http://www.ilinsky.com/articles/XMLHttpRequest/#bugs-ie-responseXML-content-type)
-			if (Env.browser === 'IE' && rText && rXML && !rXML.documentElement && /[^\/]+\/[^\+]+\+xml/.test(xhr.getResponseHeader("Content-Type"))) {
-				rXML = new window.ActiveXObject("Microsoft.XMLDOM");
-				rXML.async = false;
-				rXML.validateOnParse = false;
-				rXML.loadXML(rText);
-			}
-	
-			// Check if there is no error in document
-			if (rXML) {
-				if ((Env.browser === 'IE' && rXML.parseError !== 0) || !rXML.documentElement || rXML.documentElement.tagName === "parsererror") {
-					return null;
-				}
-			}
-			return rXML;
-		}
-
-
-		function _prepareMultipart(fd) {
-			var boundary = '----moxieboundary' + new Date().getTime()
-			, dashdash = '--'
-			, crlf = '\r\n'
-			, multipart = ''
-			, I = this.getRuntime()
-			;
-
-			if (!I.can('send_binary_string')) {
-				throw new x.RuntimeError(x.RuntimeError.NOT_SUPPORTED_ERR);
-			}
-
-			_xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
-
-			// append multipart parameters
-			fd.each(function(value, name) {
-				// Firefox 3.6 failed to convert multibyte characters to UTF-8 in sendAsBinary(), 
-				// so we try it here ourselves with: unescape(encodeURIComponent(value))
-				if (value instanceof Blob) {
-					// Build RFC2388 blob
-					multipart += dashdash + boundary + crlf +
-						'Content-Disposition: form-data; name="' + name + '"; filename="' + unescape(encodeURIComponent(value.name || 'blob')) + '"' + crlf +
-						'Content-Type: ' + (value.type || 'application/octet-stream') + crlf + crlf +
-						value.getSource() + crlf;
-				} else {
-					multipart += dashdash + boundary + crlf +
-						'Content-Disposition: form-data; name="' + name + '"' + crlf + crlf +
-						unescape(encodeURIComponent(value)) + crlf;
-				}
-			});
-
-			multipart += dashdash + boundary + dashdash + crlf;
-
-			return multipart;
-		}
-	}
-
-	return (extensions.XMLHttpRequest = XMLHttpRequest);
 });
 
 // Included from: src/javascript/runtime/html5/utils/BinaryReader.js
@@ -9728,535 +9297,7 @@ define("moxie/runtime/html5/image/Image", [
 	return (extensions.Image = HTML5Image);
 });
 
-// Included from: src/javascript/runtime/flash/Runtime.js
-
-/**
- * Runtime.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/*global ActiveXObject:true */
-
-/**
-Defines constructor for Flash runtime.
-
-@class moxie/runtime/flash/Runtime
-@private
-*/
-define("moxie/runtime/flash/Runtime", [
-	"moxie/core/utils/Basic",
-	"moxie/core/utils/Env",
-	"moxie/core/utils/Dom",
-	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime"
-], function(Basic, Env, Dom, x, Runtime) {
-	
-	var type = 'flash', extensions = {};
-
-	/**
-	Get the version of the Flash Player
-
-	@method getShimVersion
-	@private
-	@return {Number} Flash Player version
-	*/
-	function getShimVersion() {
-		var version;
-
-		try {
-			version = navigator.plugins['Shockwave Flash'];
-			version = version.description;
-		} catch (e1) {
-			try {
-				version = new ActiveXObject('ShockwaveFlash.ShockwaveFlash').GetVariable('$version');
-			} catch (e2) {
-				version = '0.0';
-			}
-		}
-		version = version.match(/\d+/g);
-		return parseFloat(version[0] + '.' + version[1]);
-	}
-
-
-	/**
-	Cross-browser SWF removal
-    	- Especially needed to safely and completely remove a SWF in Internet Explorer
-
-   	Originated from SWFObject v2.2 <http://code.google.com/p/swfobject/> 
-	*/
-	function removeSWF(id) {
-        var obj = Dom.get(id);
-        if (obj && obj.nodeName == "OBJECT") {
-            if (Env.browser === 'IE') {
-                obj.style.display = "none";
-                (function onInit(){
-                	// http://msdn.microsoft.com/en-us/library/ie/ms534360(v=vs.85).aspx
-                    if (obj.readyState == 4) {
-                        removeObjectInIE(id);
-                    }
-                    else {
-                        setTimeout(onInit, 10);
-                    }
-                })();
-            }
-            else {
-                obj.parentNode.removeChild(obj);
-            }
-        }
-    }
-
-
-	function removeObjectInIE(id) {
-        var obj = Dom.get(id);
-        if (obj) {
-            for (var i in obj) {
-                if (typeof obj[i] == "function") {
-                    obj[i] = null;
-                }
-            }
-            obj.parentNode.removeChild(obj);
-        }
-    }
-
-	/**
-	Constructor for the Flash Runtime
-	*/
-	function FlashRuntime(options) {
-		var I = this, initTimer;
-
-		options = Basic.extend({ swf_url: Env.swf_url }, options);
-
-		Runtime.call(this, options, type, {
-			access_binary: function(value) {
-				return value && I.mode === 'browser';
-			},
-			access_image_binary: function(value) {
-				return value && I.mode === 'browser';
-			},
-			display_media: Runtime.capTest(defined('moxie/image/Image')),
-			do_cors: Runtime.capTrue,
-			drag_and_drop: false,
-			report_upload_progress: function() {
-				return I.mode === 'client';
-			},
-			resize_image: Runtime.capTrue,
-			return_response_headers: false,
-			return_response_type: function(responseType) {
-				if (responseType === 'json' && !!window.JSON) {
-					return true;
-				} 
-				return !Basic.arrayDiff(responseType, ['', 'text', 'document']) || I.mode === 'browser';
-			},
-			return_status_code: function(code) {
-				return I.mode === 'browser' || !Basic.arrayDiff(code, [200, 404]);
-			},
-			select_file: Runtime.capTrue,
-			select_multiple: Runtime.capTrue,
-			send_binary_string: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_browser_cookies: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_custom_headers: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_multipart: Runtime.capTrue,
-			slice_blob: function(value) {
-				return value && I.mode === 'browser';
-			},
-			stream_upload: function(value) {
-				return value && I.mode === 'browser';
-			},
-			summon_file_dialog: false,
-			upload_filesize: function(size) {
-				return Basic.parseSizeStr(size) <= 2097152 || I.mode === 'client';
-			},
-			use_http_method: function(methods) {
-				return !Basic.arrayDiff(methods, ['GET', 'POST']);
-			}
-		}, { 
-			// capabilities that require specific mode
-			access_binary: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			access_image_binary: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			report_upload_progress: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			return_response_type: function(responseType) {
-				return Basic.arrayDiff(responseType, ['', 'text', 'json', 'document']) ? 'browser' : ['client', 'browser'];
-			},
-			return_status_code: function(code) {
-				return Basic.arrayDiff(code, [200, 404]) ? 'browser' : ['client', 'browser'];
-			},
-			send_binary_string: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			send_browser_cookies: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			send_custom_headers: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			slice_blob: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			stream_upload: function(value) {
-				return value ? 'client' : 'browser';
-			},
-			upload_filesize: function(size) {
-				return Basic.parseSizeStr(size) >= 2097152 ? 'client' : 'browser';
-			}
-		}, 'client');
-
-
-		// minimal requirement for Flash Player version
-		if (getShimVersion() < 11.3) {
-			if (MXI_DEBUG && Env.debug.runtime) {
-				Env.log("\tFlash didn't meet minimal version requirement (11.3).");	
-			}
-
-			this.mode = false; // with falsy mode, runtime won't operable, no matter what the mode was before
-		}
-
-
-		Basic.extend(this, {
-
-			getShim: function() {
-				return Dom.get(this.uid);
-			},
-
-			shimExec: function(component, action) {
-				var args = [].slice.call(arguments, 2);
-				return I.getShim().exec(this.uid, component, action, args);
-			},
-
-			init: function() {
-				var html, el, container;
-
-				container = this.getShimContainer();
-
-				// if not the minimal height, shims are not initialized in older browsers (e.g FF3.6, IE6,7,8, Safari 4.0,5.0, etc)
-				Basic.extend(container.style, {
-					position: 'absolute',
-					top: '-8px',
-					left: '-8px',
-					width: '9px',
-					height: '9px',
-					overflow: 'hidden'
-				});
-
-				// insert flash object
-				html = '<object id="' + this.uid + '" type="application/x-shockwave-flash" data="' +  options.swf_url + '" ';
-
-				if (Env.browser === 'IE') {
-					html += 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" ';
-				}
-
-				html += 'width="100%" height="100%" style="outline:0">'  +
-					'<param name="movie" value="' + options.swf_url + '" />' +
-					'<param name="flashvars" value="uid=' + escape(this.uid) + '&target=' + Runtime.getGlobalEventTarget() + '" />' +
-					'<param name="wmode" value="transparent" />' +
-					'<param name="allowscriptaccess" value="always" />' +
-				'</object>';
-
-				if (Env.browser === 'IE') {
-					el = document.createElement('div');
-					container.appendChild(el);
-					el.outerHTML = html;
-					el = container = null; // just in case
-				} else {
-					container.innerHTML = html;
-				}
-
-				// Init is dispatched by the shim
-				initTimer = setTimeout(function() {
-					if (I && !I.initialized) { // runtime might be already destroyed by this moment
-						I.trigger("Error", new x.RuntimeError(x.RuntimeError.NOT_INIT_ERR));
-
-						if (MXI_DEBUG && Env.debug.runtime) {
-							Env.log("\tFlash failed to initialize within a specified period of time (typically 5s).");	
-						}
-					}
-				}, 5000);
-			},
-
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					removeSWF(I.uid); // SWF removal requires special care in IE
-
-					destroy.call(I);
-					clearTimeout(initTimer); // initialization check might be still onwait
-					options = initTimer = destroy = I = null;
-				};
-			}(this.destroy))
-
-		}, extensions);
-	}
-
-	Runtime.addConstructor(type, FlashRuntime);
-
-	return extensions;
-});
-
-// Included from: src/javascript/runtime/flash/file/Blob.js
-
-/**
- * Blob.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/Blob
-@private
-*/
-define("moxie/runtime/flash/file/Blob", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/file/Blob"
-], function(extensions, Blob) {
-
-	var FlashBlob = {
-		slice: function(blob, start, end, type) {
-			var self = this.getRuntime();
-
-			if (start < 0) {
-				start = Math.max(blob.size + start, 0);
-			} else if (start > 0) {
-				start = Math.min(start, blob.size);
-			}
-
-			if (end < 0) {
-				end = Math.max(blob.size + end, 0);
-			} else if (end > 0) {
-				end = Math.min(end, blob.size);
-			}
-
-			blob = self.shimExec.call(this, 'Blob', 'slice', start, end, type || '');
-
-			if (blob) {
-				blob = new Blob(self.uid, blob);
-			}
-			return blob;
-		}
-	};
-
-	return (extensions.Blob = FlashBlob);
-});
-
-// Included from: src/javascript/runtime/flash/file/FileInput.js
-
-/**
- * FileInput.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/FileInput
-@private
-*/
-define("moxie/runtime/flash/file/FileInput", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/file/File",
-	"moxie/core/utils/Dom",
-	"moxie/core/utils/Basic"
-], function(extensions, File, Dom, Basic) {
-
-	var FileInput = {
-		init: function(options) {
-			var comp = this, I = this.getRuntime();
-			var browseButton = Dom.get(options.browse_button);
-
-			if (browseButton) {
-				browseButton.setAttribute('tabindex', -1);
-				browseButton = null;
-			}
-
-			this.bind("Change", function() {
-				var files = I.shimExec.call(comp, 'FileInput', 'getFiles');
-				comp.files = [];
-				Basic.each(files, function(file) {
-					comp.files.push(new File(I.uid, file));
-				});
-			}, 999);
-
-			this.getRuntime().shimExec.call(this, 'FileInput', 'init', {
-				accept: options.accept,
-				multiple: options.multiple
-			});
-
-			this.trigger('ready');
-		}
-	};
-
-	return (extensions.FileInput = FileInput);
-});
-
-// Included from: src/javascript/runtime/flash/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/FileReader
-@private
-*/
-define("moxie/runtime/flash/file/FileReader", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/core/utils/Encode"
-], function(extensions, Encode) {
-
-	function _formatData(data, op) {
-		switch (op) {
-			case 'readAsText':
-				return Encode.atob(data, 'utf8');
-			case 'readAsBinaryString':
-				return Encode.atob(data);
-			case 'readAsDataURL':
-				return data;
-		}
-		return null;
-	}
-
-	var FileReader = {
-		read: function(op, blob) {
-			var comp = this;
-
-			comp.result = '';
-
-			// special prefix for DataURL read mode
-			if (op === 'readAsDataURL') {
-				comp.result = 'data:' + (blob.type || '') + ';base64,';
-			}
-
-			comp.bind('Progress', function(e, data) {
-				if (data) {
-					comp.result += _formatData(data, op);
-				}
-			}, 999);
-
-			return comp.getRuntime().shimExec.call(this, 'FileReader', 'readAsBase64', blob.uid);
-		}
-	};
-
-	return (extensions.FileReader = FileReader);
-});
-
-// Included from: src/javascript/runtime/flash/file/FileReaderSync.js
-
-/**
- * FileReaderSync.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/file/FileReaderSync
-@private
-*/
-define("moxie/runtime/flash/file/FileReaderSync", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/core/utils/Encode"
-], function(extensions, Encode) {
-	
-	function _formatData(data, op) {
-		switch (op) {
-			case 'readAsText':
-				return Encode.atob(data, 'utf8');
-			case 'readAsBinaryString':
-				return Encode.atob(data);
-			case 'readAsDataURL':
-				return data;
-		}
-		return null;
-	}
-
-	var FileReaderSync = {
-		read: function(op, blob) {
-			var result, self = this.getRuntime();
-
-			result = self.shimExec.call(this, 'FileReaderSync', 'readAsBase64', blob.uid);
-			if (!result) {
-				return null; // or throw ex
-			}
-
-			// special prefix for DataURL read mode
-			if (op === 'readAsDataURL') {
-				result = 'data:' + (blob.type || '') + ';base64,' + result;
-			}
-
-			return _formatData(result, op, blob.type);
-		}
-	};
-
-	return (extensions.FileReaderSync = FileReaderSync);
-});
-
-// Included from: src/javascript/runtime/flash/runtime/Transporter.js
-
-/**
- * Transporter.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/runtime/Transporter
-@private
-*/
-define("moxie/runtime/flash/runtime/Transporter", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/file/Blob"
-], function(extensions, Blob) {
-
-	var Transporter = {
-		getAsBlob: function(type) {
-			var self = this.getRuntime()
-			, blob = self.shimExec.call(this, 'Transporter', 'getAsBlob', type)
-			;
-			if (blob) {
-				return new Blob(self.uid, blob);
-			}
-			return null;
-		}
-	};
-
-	return (extensions.Transporter = Transporter);
-});
-
-// Included from: src/javascript/runtime/flash/xhr/XMLHttpRequest.js
+// Included from: src/javascript/runtime/html5/xhr/XMLHttpRequest.js
 
 /**
  * XMLHttpRequest.js
@@ -10268,771 +9309,440 @@ define("moxie/runtime/flash/runtime/Transporter", [
  * Contributing: http://www.plupload.com/contributing
  */
 
-/**
-@class moxie/runtime/flash/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/flash/xhr/XMLHttpRequest", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/file/Blob",
-	"moxie/file/File",
-	"moxie/file/FileReaderSync",
-	"moxie/runtime/flash/file/FileReaderSync",
-	"moxie/xhr/FormData",
-	"moxie/runtime/Transporter",
-	"moxie/runtime/flash/runtime/Transporter"
-], function(extensions, Basic, Blob, File, FileReaderSync, FileReaderSyncFlash, FormData, Transporter, TransporterFlash) {
-	
-	var XMLHttpRequest = {
-
-		send: function(meta, data) {
-			var target = this, self = target.getRuntime();
-
-			function send() {
-				meta.transport = self.mode;
-				self.shimExec.call(target, 'XMLHttpRequest', 'send', meta, data);
-			}
-
-
-			function appendBlob(name, blob) {
-				self.shimExec.call(target, 'XMLHttpRequest', 'appendBlob', name, blob.uid);
-				data = null;
-				send();
-			}
-
-
-			function attachBlob(blob, cb) {
-				var tr = new Transporter();
-
-				tr.bind("TransportingComplete", function() {
-					cb(this.result);
-				});
-
-				tr.transport(blob.getSource(), blob.type, {
-					ruid: self.uid
-				});
-			}
-
-			// copy over the headers if any
-			if (!Basic.isEmptyObj(meta.headers)) {
-				Basic.each(meta.headers, function(value, header) {
-					self.shimExec.call(target, 'XMLHttpRequest', 'setRequestHeader', header, value.toString()); // Silverlight doesn't accept integers into the arguments of type object
-				});
-			}
-
-			// transfer over multipart params and blob itself
-			if (data instanceof FormData) {
-				var blobField;
-				data.each(function(value, name) {
-					if (value instanceof Blob) {
-						blobField = name;
-					} else {
-						self.shimExec.call(target, 'XMLHttpRequest', 'append', name, value);
-					}
-				});
-
-				if (!data.hasBlob()) {
-					data = null;
-					send();
-				} else {
-					var blob = data.getBlob();
-					if (blob.isDetached()) {
-						attachBlob(blob, function(attachedBlob) {
-							blob.destroy();
-							appendBlob(blobField, attachedBlob);		
-						});
-					} else {
-						appendBlob(blobField, blob);
-					}
-				}
-			} else if (data instanceof Blob) {
-				if (data.isDetached()) {
-					attachBlob(data, function(attachedBlob) {
-						data.destroy();
-						data = attachedBlob.uid;
-						send();
-					});
-				} else {
-					data = data.uid;
-					send();
-				}
-			} else {
-				send();
-			}
-		},
-
-		getResponse: function(responseType) {
-			var frs, blob, self = this.getRuntime();
-
-			blob = self.shimExec.call(this, 'XMLHttpRequest', 'getResponseAsBlob');
-
-			if (blob) {
-				blob = new File(self.uid, blob);
-
-				if ('blob' === responseType) {
-					return blob;
-				}
-
-				try { 
-					frs = new FileReaderSync();
-
-					if (!!~Basic.inArray(responseType, ["", "text"])) {
-						return frs.readAsText(blob);
-					} else if ('json' === responseType && !!window.JSON) {
-						return JSON.parse(frs.readAsText(blob));
-					}
-				} finally {
-					blob.destroy();
-				}
-			}
-			return null;
-		},
-
-		abort: function(upload_complete_flag) {
-			var self = this.getRuntime();
-
-			self.shimExec.call(this, 'XMLHttpRequest', 'abort');
-
-			this.dispatchEvent('readystatechange');
-			// this.dispatchEvent('progress');
-			this.dispatchEvent('abort');
-
-			//if (!upload_complete_flag) {
-				// this.dispatchEvent('uploadprogress');
-			//}
-		}
-	};
-
-	return (extensions.XMLHttpRequest = XMLHttpRequest);
-});
-
-// Included from: src/javascript/runtime/flash/image/Image.js
-
-/**
- * Image.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/flash/image/Image
-@private
-*/
-define("moxie/runtime/flash/image/Image", [
-	"moxie/runtime/flash/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/Transporter",
-	"moxie/file/Blob",
-	"moxie/file/FileReaderSync"
-], function(extensions, Basic, Transporter, Blob, FileReaderSync) {
-	
-	var Image = {
-		loadFromBlob: function(blob) {
-			var comp = this, self = comp.getRuntime();
-
-			function exec(srcBlob) {
-				self.shimExec.call(comp, 'Image', 'loadFromBlob', srcBlob.uid);
-				comp = self = null;
-			}
-
-			if (blob.isDetached()) { // binary string
-				var tr = new Transporter();
-				tr.bind("TransportingComplete", function() {
-					exec(tr.result.getSource());
-				});
-				tr.transport(blob.getSource(), blob.type, { ruid: self.uid });
-			} else {
-				exec(blob.getSource());
-			}
-		},
-
-		loadFromImage: function(img) {
-			var self = this.getRuntime();
-			return self.shimExec.call(this, 'Image', 'loadFromImage', img.uid);
-		},
-
-		getInfo: function() {
-			var self = this.getRuntime()
-			, info = self.shimExec.call(this, 'Image', 'getInfo')
-			;
-
-			if (info.meta && info.meta.thumb && info.meta.thumb.data && !(self.meta.thumb.data instanceof Blob)) {
-				info.meta.thumb.data = new Blob(self.uid, info.meta.thumb.data);
-			}
-			return info;
-		},
-
-		getAsBlob: function(type, quality) {
-			var self = this.getRuntime()
-			, blob = self.shimExec.call(this, 'Image', 'getAsBlob', type, quality)
-			;
-			if (blob) {
-				return new Blob(self.uid, blob);
-			}
-			return null;
-		},
-
-		getAsDataURL: function() {
-			var self = this.getRuntime()
-			, blob = self.Image.getAsBlob.apply(this, arguments)
-			, frs
-			;
-			if (!blob) {
-				return null;
-			}
-			frs = new FileReaderSync();
-			return frs.readAsDataURL(blob);
-		}
-	};
-
-	return (extensions.Image = Image);
-});
-
-// Included from: src/javascript/runtime/silverlight/Runtime.js
-
-/**
- * RunTime.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
 /*global ActiveXObject:true */
 
 /**
-Defines constructor for Silverlight runtime.
-
-@class moxie/runtime/silverlight/Runtime
+@class moxie/runtime/html5/xhr/XMLHttpRequest
 @private
 */
-define("moxie/runtime/silverlight/Runtime", [
+define("moxie/runtime/html5/xhr/XMLHttpRequest", [
+	"moxie/runtime/html5/Runtime",
 	"moxie/core/utils/Basic",
-	"moxie/core/utils/Env",
-	"moxie/core/utils/Dom",
+	"moxie/core/utils/Mime",
+	"moxie/core/utils/Url",
+	"moxie/file/File",
+	"moxie/file/Blob",
+	"moxie/xhr/FormData",
 	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime"
-], function(Basic, Env, Dom, x, Runtime) {
+	"moxie/core/utils/Env"
+], function(extensions, Basic, Mime, Url, File, Blob, FormData, x, Env) {
 	
-	var type = "silverlight", extensions = {};
+	function XMLHttpRequest() {
+		var self = this
+		, _xhr
+		, _filename
+		;
 
-	function isInstalled(version) {
-		var isVersionSupported = false, control = null, actualVer,
-			actualVerArray, reqVerArray, requiredVersionPart, actualVersionPart, index = 0;
+		Basic.extend(this, {
+			send: function(meta, data) {
+				var target = this
+				, isGecko2_5_6 = (Env.browser === 'Mozilla' && Env.verComp(Env.version, 4, '>=') && Env.verComp(Env.version, 7, '<'))
+				, isAndroidBrowser = Env.browser === 'Android Browser'
+				, mustSendAsBinary = false
+				;
 
-		try {
-			try {
-				control = new ActiveXObject('AgControl.AgControl');
+				// extract file name
+				_filename = meta.url.replace(/^.+?\/([\w\-\.]+)$/, '$1').toLowerCase();
 
-				if (control.IsVersionSupported(version)) {
-					isVersionSupported = true;
+				_xhr = _getNativeXHR();
+				_xhr.open(meta.method, meta.url, meta.async, meta.user, meta.password);
+
+
+				// prepare data to be sent
+				if (data instanceof Blob) {
+					if (data.isDetached()) {
+						mustSendAsBinary = true;
+					}
+					data = data.getSource();
+				} else if (data instanceof FormData) {
+
+					if (data.hasBlob()) {
+						if (data.getBlob().isDetached()) {
+							data = _prepareMultipart.call(target, data); // _xhr must be instantiated and be in OPENED state
+							mustSendAsBinary = true;
+						} else if ((isGecko2_5_6 || isAndroidBrowser) && Basic.typeOf(data.getBlob().getSource()) === 'blob' && window.FileReader) {
+							// Gecko 2/5/6 can't send blob in FormData: https://bugzilla.mozilla.org/show_bug.cgi?id=649150
+							// Android browsers (default one and Dolphin) seem to have the same issue, see: #613
+							_preloadAndSend.call(target, meta, data);
+							return; // _preloadAndSend will reinvoke send() with transmutated FormData =%D
+						}	
+					}
+
+					// transfer fields to real FormData
+					if (data instanceof FormData) { // if still a FormData, e.g. not mangled by _prepareMultipart()
+						var fd = new window.FormData();
+						data.each(function(value, name) {
+							if (value instanceof Blob) {
+								fd.append(name, value.getSource());
+							} else {
+								fd.append(name, value);
+							}
+						});
+						data = fd;
+					}
 				}
 
-				control = null;
-			} catch (e) {
-				var plugin = navigator.plugins["Silverlight Plug-In"];
 
-				if (plugin) {
-					actualVer = plugin.description;
-
-					if (actualVer === "1.0.30226.2") {
-						actualVer = "2.0.30226.2";
+				// if XHR L2
+				if (_xhr.upload) {
+					if (meta.withCredentials) {
+						_xhr.withCredentials = true;
 					}
 
-					actualVerArray = actualVer.split(".");
+					_xhr.addEventListener('load', function(e) {
+						target.trigger(e);
+					});
 
-					while (actualVerArray.length > 3) {
-						actualVerArray.pop();
-					}
+					_xhr.addEventListener('error', function(e) {
+						target.trigger(e);
+					});
 
-					while ( actualVerArray.length < 4) {
-						actualVerArray.push(0);
-					}
+					// additionally listen to progress events
+					_xhr.addEventListener('progress', function(e) {
+						target.trigger(e);
+					});
 
-					reqVerArray = version.split(".");
-
-					while (reqVerArray.length > 4) {
-						reqVerArray.pop();
-					}
-
-					do {
-						requiredVersionPart = parseInt(reqVerArray[index], 10);
-						actualVersionPart = parseInt(actualVerArray[index], 10);
-						index++;
-					} while (index < reqVerArray.length && requiredVersionPart === actualVersionPart);
-
-					if (requiredVersionPart <= actualVersionPart && !isNaN(requiredVersionPart)) {
-						isVersionSupported = true;
-					}
-				}
-			}
-		} catch (e2) {
-			isVersionSupported = false;
-		}
-
-		return isVersionSupported;
-	}
-
-	/**
-	Constructor for the Silverlight Runtime
-	*/
-	function SilverlightRuntime(options) {
-		var I = this, initTimer;
-
-		options = Basic.extend({ xap_url: Env.xap_url }, options);
-
-		Runtime.call(this, options, type, {
-			access_binary: Runtime.capTrue,
-			access_image_binary: Runtime.capTrue,
-			display_media: Runtime.capTest(defined('moxie/image/Image')),
-			do_cors: Runtime.capTrue,
-			drag_and_drop: false,
-			report_upload_progress: Runtime.capTrue,
-			resize_image: Runtime.capTrue,
-			return_response_headers: function(value) {
-				return value && I.mode === 'client';
-			},
-			return_response_type: function(responseType) {
-				if (responseType !== 'json') {
-					return true;
+					_xhr.upload.addEventListener('progress', function(e) {
+						target.trigger({
+							type: 'UploadProgress',
+							loaded: e.loaded,
+							total: e.total
+						});
+					});
+				// ... otherwise simulate XHR L2
 				} else {
-					return !!window.JSON;
+					_xhr.onreadystatechange = function onReadyStateChange() {
+						
+						// fake Level 2 events
+						switch (_xhr.readyState) {
+							
+							case 1: // XMLHttpRequest.OPENED
+								// readystatechanged is fired twice for OPENED state (in IE and Mozilla) - neu
+								break;
+							
+							// looks like HEADERS_RECEIVED (state 2) is not reported in Opera (or it's old versions) - neu
+							case 2: // XMLHttpRequest.HEADERS_RECEIVED
+								break;
+								
+							case 3: // XMLHttpRequest.LOADING 
+								// try to fire progress event for not XHR L2
+								var total, loaded;
+								
+								try {
+									if (Url.hasSameOrigin(meta.url)) { // Content-Length not accessible for cross-domain on some browsers
+										total = _xhr.getResponseHeader('Content-Length') || 0; // old Safari throws an exception here
+									}
+
+									if (_xhr.responseText) { // responseText was introduced in IE7
+										loaded = _xhr.responseText.length;
+									}
+								} catch(ex) {
+									total = loaded = 0;
+								}
+
+								target.trigger({
+									type: 'progress',
+									lengthComputable: !!total,
+									total: parseInt(total, 10),
+									loaded: loaded
+								});
+								break;
+								
+							case 4: // XMLHttpRequest.DONE
+								// release readystatechange handler (mostly for IE)
+								_xhr.onreadystatechange = function() {};
+
+								// usually status 0 is returned when server is unreachable, but FF also fails to status 0 for 408 timeout
+								try {
+									if (_xhr.status >= 200 && _xhr.status < 400) {
+										target.trigger('load');
+										break;
+									}
+								} catch(ex) {}
+
+								target.trigger('error');
+								break;
+						}
+					};
+				}
+				
+
+				// set request headers
+				if (!Basic.isEmptyObj(meta.headers)) {
+					Basic.each(meta.headers, function(value, header) {
+						_xhr.setRequestHeader(header, value);
+					});
+				}
+
+				// request response type
+				if ("" !== meta.responseType && 'responseType' in _xhr) {
+					if ('json' === meta.responseType && !Env.can('return_response_type', 'json')) { // we can fake this one
+						_xhr.responseType = 'text';
+					} else {
+						_xhr.responseType = meta.responseType;
+					}
+				}
+
+				// send ...
+				if (!mustSendAsBinary) {
+					_xhr.send(data);
+				} else {
+					if (_xhr.sendAsBinary) { // Gecko
+						_xhr.sendAsBinary(data);
+					} else { // other browsers having support for typed arrays
+						(function() {
+							// mimic Gecko's sendAsBinary
+							var ui8a = new Uint8Array(data.length);
+							for (var i = 0; i < data.length; i++) {
+								ui8a[i] = (data.charCodeAt(i) & 0xff);
+							}
+							_xhr.send(ui8a.buffer);
+						}());
+					}
+				}
+
+				target.trigger('loadstart');
+			},
+
+			getStatus: function() {
+				// according to W3C spec it should return 0 for readyState < 3, but instead it throws an exception
+				try {
+					if (_xhr) {
+						return _xhr.status;
+					}
+				} catch(ex) {}
+				return 0;
+			},
+
+			getResponse: function(responseType) {
+				var I = this.getRuntime();
+
+				try {
+					switch (responseType) {
+						case 'blob':
+							var file = new File(I.uid, _xhr.response);
+							
+							// try to extract file name from content-disposition if possible (might be - not, if CORS for example)	
+							var disposition = _xhr.getResponseHeader('Content-Disposition');
+							if (disposition) {
+								// extract filename from response header if available
+								var match = disposition.match(/filename=([\'\"'])([^\1]+)\1/);
+								if (match) {
+									_filename = match[2];
+								}
+							}
+							file.name = _filename;
+
+							// pre-webkit Opera doesn't set type property on the blob response
+							if (!file.type) {
+								file.type = Mime.getFileMime(_filename);
+							}
+							return file;
+
+						case 'json':
+							if (!Env.can('return_response_type', 'json')) {
+								return _xhr.status === 200 && !!window.JSON ? JSON.parse(_xhr.responseText) : null;
+							}
+							return _xhr.response;
+
+						case 'document':
+							return _getDocument(_xhr);
+
+						default:
+							return _xhr.responseText !== '' ? _xhr.responseText : null; // against the specs, but for consistency across the runtimes
+					}
+				} catch(ex) {
+					return null;
+				}				
+			},
+
+			getAllResponseHeaders: function() {
+				try {
+					return _xhr.getAllResponseHeaders();
+				} catch(ex) {}
+				return '';
+			},
+
+			abort: function() {
+				if (_xhr) {
+					_xhr.abort();
 				}
 			},
-			return_status_code: function(code) {
-				return I.mode === 'client' || !Basic.arrayDiff(code, [200, 404]);
-			},
-			select_file: Runtime.capTrue,
-			select_multiple: Runtime.capTrue,
-			send_binary_string: Runtime.capTrue,
-			send_browser_cookies: function(value) {
-				return value && I.mode === 'browser';
-			},
-			send_custom_headers: function(value) {
-				return value && I.mode === 'client';
-			},
-			send_multipart: Runtime.capTrue,
-			slice_blob: Runtime.capTrue,
-			stream_upload: true,
-			summon_file_dialog: false,
-			upload_filesize: Runtime.capTrue,
-			use_http_method: function(methods) {
-				return I.mode === 'client' || !Basic.arrayDiff(methods, ['GET', 'POST']);
-			}
-		}, { 
-			// capabilities that require specific mode
-			return_response_headers: function(value) {
-				return value ? 'client' : 'browser';
-			},
-			return_status_code: function(code) {
-				return Basic.arrayDiff(code, [200, 404]) ? 'client' : ['client', 'browser'];
-			},
-			send_browser_cookies: function(value) {
-				return value ? 'browser' : 'client';
-			},
-			send_custom_headers: function(value) {
-				return value ? 'client' : 'browser';
-			},
-			use_http_method: function(methods) {
-				return Basic.arrayDiff(methods, ['GET', 'POST']) ? 'client' : ['client', 'browser'];
+
+			destroy: function() {
+				self = _filename = null;
+				this.getRuntime().getShim().removeInstance(this.uid);
 			}
 		});
 
 
-		// minimal requirement
-		if (!isInstalled('2.0.31005.0') || Env.browser === 'Opera') {
-			if (MXI_DEBUG && Env.debug.runtime) {
-				Env.log("\tSilverlight is not installed or minimal version (2.0.31005.0) requirement not met (not likely).");	
-			}
-
-			this.mode = false;
-		}
-
-
-		Basic.extend(this, {
-			getShim: function() {
-				return Dom.get(this.uid).content.Moxie;
-			},
-
-			shimExec: function(component, action) {
-				var args = [].slice.call(arguments, 2);
-				return I.getShim().exec(this.uid, component, action, args);
-			},
-
-			init : function() {
-				var container;
-
-				container = this.getShimContainer();
-
-				container.innerHTML = '<object id="' + this.uid + '" data="data:application/x-silverlight," type="application/x-silverlight-2" width="100%" height="100%" style="outline:none;">' +
-					'<param name="source" value="' + options.xap_url + '"/>' +
-					'<param name="background" value="Transparent"/>' +
-					'<param name="windowless" value="true"/>' +
-					'<param name="enablehtmlaccess" value="true"/>' +
-					'<param name="initParams" value="uid=' + this.uid + ',target=' + Runtime.getGlobalEventTarget() + '"/>' +
-				'</object>';
-
-				// Init is dispatched by the shim
-				initTimer = setTimeout(function() {
-					if (I && !I.initialized) { // runtime might be already destroyed by this moment
-						I.trigger("Error", new x.RuntimeError(x.RuntimeError.NOT_INIT_ERR));
-
-						if (MXI_DEBUG && Env.debug.runtime) {
-							Env.log("\Silverlight failed to initialize within a specified period of time (5-10s).");	
-						}
-					}
-				}, Env.OS !== 'Windows'? 10000 : 5000); // give it more time to initialize in non Windows OS (like Mac)
-			},
-
-			destroy: (function(destroy) { // extend default destroy method
-				return function() {
-					destroy.call(I);
-					clearTimeout(initTimer); // initialization check might be still onwait
-					options = initTimer = destroy = I = null;
-				};
-			}(this.destroy))
-
-		}, extensions);
-	}
-
-	Runtime.addConstructor(type, SilverlightRuntime); 
-
-	return extensions;
-});
-
-// Included from: src/javascript/runtime/silverlight/file/Blob.js
-
-/**
- * Blob.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/Blob
-@private
-*/
-define("moxie/runtime/silverlight/file/Blob", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/Blob"
-], function(extensions, Basic, Blob) {
-	return (extensions.Blob = Basic.extend({}, Blob));
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileInput.js
-
-/**
- * FileInput.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileInput
-@private
-*/
-define("moxie/runtime/silverlight/file/FileInput", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/file/File",
-	"moxie/core/utils/Dom",
-	"moxie/core/utils/Basic"
-], function(extensions, File, Dom, Basic) {
-
-	function toFilters(accept) {
-		var filter = '';
-		for (var i = 0; i < accept.length; i++) {
-			filter += (filter !== '' ? '|' : '') + accept[i].title + " | *." + accept[i].extensions.replace(/,/g, ';*.');
-		}
-		return filter;
-	}
-
-	
-	var FileInput = {
-		init: function(options) {
-			var comp = this, I = this.getRuntime();
-			var browseButton = Dom.get(options.browse_button);
-
-			if (browseButton) {
-				browseButton.setAttribute('tabindex', -1);
-				browseButton = null;
-			}
-
-			this.bind("Change", function() {
-				var files = I.shimExec.call(comp, 'FileInput', 'getFiles');
-				comp.files = [];
-				Basic.each(files, function(file) {
-					comp.files.push(new File(I.uid, file));
-				});
-			}, 999);
+		// here we go... ugly fix for ugly bug
+		function _preloadAndSend(meta, data) {
+			var target = this, blob, fr;
+				
+			// get original blob
+			blob = data.getBlob().getSource();
 			
-			I.shimExec.call(this, 'FileInput', 'init', toFilters(options.accept), options.multiple);
-			this.trigger('ready');
-		},
+			// preload blob in memory to be sent as binary string
+			fr = new window.FileReader();
+			fr.onload = function() {
+				// overwrite original blob
+				data.append(data.getBlobName(), new Blob(null, {
+					type: blob.type,
+					data: fr.result
+				}));
+				// invoke send operation again
+				self.send.call(target, meta, data);
+			};
+			fr.readAsBinaryString(blob);
+		}
 
-		setOption: function(name, value) {
-			if (name == 'accept') {
-				value = toFilters(value);
+		
+		function _getNativeXHR() {
+			if (window.XMLHttpRequest && !(Env.browser === 'IE' && Env.verComp(Env.version, 8, '<'))) { // IE7 has native XHR but it's buggy
+				return new window.XMLHttpRequest();
+			} else {
+				return (function() {
+					var progIDs = ['Msxml2.XMLHTTP.6.0', 'Microsoft.XMLHTTP']; // if 6.0 available, use it, otherwise failback to default 3.0
+					for (var i = 0; i < progIDs.length; i++) {
+						try {
+							return new ActiveXObject(progIDs[i]);
+						} catch (ex) {}
+					}
+				})();
 			}
-			this.getRuntime().shimExec.call(this, 'FileInput', 'setOption', name, value);
 		}
-	};
-
-	return (extensions.FileInput = FileInput);
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileDrop.js
-
-/**
- * FileDrop.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileDrop
-@private
-*/
-define("moxie/runtime/silverlight/file/FileDrop", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Dom", 
-	"moxie/core/utils/Events"
-], function(extensions, Dom, Events) {
-
-	// not exactly useful, since works only in safari (...crickets...)
-	var FileDrop = {
-		init: function() {
-			var comp = this, self = comp.getRuntime(), dropZone;
-
-			dropZone = self.getShimContainer();
-
-			Events.addEvent(dropZone, 'dragover', function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				e.dataTransfer.dropEffect = 'copy';
-			}, comp.uid);
-
-			Events.addEvent(dropZone, 'dragenter', function(e) {
-				e.preventDefault();
-				var flag = Dom.get(self.uid).dragEnter(e);
-				// If handled, then stop propagation of event in DOM
-				if (flag) {
-					e.stopPropagation();
+		
+		// @credits Sergey Ilinsky	(http://www.ilinsky.com/)
+		function _getDocument(xhr) {
+			var rXML = xhr.responseXML;
+			var rText = xhr.responseText;
+			
+			// Try parsing responseText (@see: http://www.ilinsky.com/articles/XMLHttpRequest/#bugs-ie-responseXML-content-type)
+			if (Env.browser === 'IE' && rText && rXML && !rXML.documentElement && /[^\/]+\/[^\+]+\+xml/.test(xhr.getResponseHeader("Content-Type"))) {
+				rXML = new window.ActiveXObject("Microsoft.XMLDOM");
+				rXML.async = false;
+				rXML.validateOnParse = false;
+				rXML.loadXML(rText);
+			}
+	
+			// Check if there is no error in document
+			if (rXML) {
+				if ((Env.browser === 'IE' && rXML.parseError !== 0) || !rXML.documentElement || rXML.documentElement.tagName === "parsererror") {
+					return null;
 				}
-			}, comp.uid);
-
-			Events.addEvent(dropZone, 'drop', function(e) {
-				e.preventDefault();
-				var flag = Dom.get(self.uid).dragDrop(e);
-				// If handled, then stop propagation of event in DOM
-				if (flag) {
-					e.stopPropagation();
-				}
-			}, comp.uid);
-
-			return self.shimExec.call(this, 'FileDrop', 'init');
+			}
+			return rXML;
 		}
-	};
 
-	return (extensions.FileDrop = FileDrop);
-});
 
-// Included from: src/javascript/runtime/silverlight/file/FileReader.js
-
-/**
- * FileReader.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileReader
-@private
-*/
-define("moxie/runtime/silverlight/file/FileReader", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/FileReader"
-], function(extensions, Basic, FileReader) {
-	return (extensions.FileReader = Basic.extend({}, FileReader));
-});
-
-// Included from: src/javascript/runtime/silverlight/file/FileReaderSync.js
-
-/**
- * FileReaderSync.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/file/FileReaderSync
-@private
-*/
-define("moxie/runtime/silverlight/file/FileReaderSync", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/file/FileReaderSync"
-], function(extensions, Basic, FileReaderSync) {
-	return (extensions.FileReaderSync = Basic.extend({}, FileReaderSync));
-});
-
-// Included from: src/javascript/runtime/silverlight/runtime/Transporter.js
-
-/**
- * Transporter.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/runtime/Transporter
-@private
-*/
-define("moxie/runtime/silverlight/runtime/Transporter", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/runtime/Transporter"
-], function(extensions, Basic, Transporter) {
-	return (extensions.Transporter = Basic.extend({}, Transporter));
-});
-
-// Included from: src/javascript/runtime/silverlight/xhr/XMLHttpRequest.js
-
-/**
- * XMLHttpRequest.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
-
-/**
-@class moxie/runtime/silverlight/xhr/XMLHttpRequest
-@private
-*/
-define("moxie/runtime/silverlight/xhr/XMLHttpRequest", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/runtime/flash/xhr/XMLHttpRequest",
-	"moxie/runtime/silverlight/file/FileReaderSync",
-	"moxie/runtime/silverlight/runtime/Transporter"
-], function(extensions, Basic, XMLHttpRequest, FileReaderSyncSilverlight, TransporterSilverlight) {
-	return (extensions.XMLHttpRequest = Basic.extend({}, XMLHttpRequest));
-});
-
-// Included from: src/javascript/runtime/silverlight/image/Image.js
-
-/**
- * Image.js
- *
- * Copyright 2013, Moxiecode Systems AB
- * Released under GPL License.
- *
- * License: http://www.plupload.com/license
- * Contributing: http://www.plupload.com/contributing
- */
- 
-/**
-@class moxie/runtime/silverlight/image/Image
-@private
-*/
-define("moxie/runtime/silverlight/image/Image", [
-	"moxie/runtime/silverlight/Runtime",
-	"moxie/core/utils/Basic",
-	"moxie/file/Blob",
-	"moxie/runtime/flash/image/Image"
-], function(extensions, Basic, Blob, Image) {
-	return (extensions.Image = Basic.extend({}, Image, {
-
-		getInfo: function() {
-			var self = this.getRuntime()
-			, grps = ['tiff', 'exif', 'gps', 'thumb']
-			, info = { meta: {} }
-			, rawInfo = self.shimExec.call(this, 'Image', 'getInfo')
+		function _prepareMultipart(fd) {
+			var boundary = '----moxieboundary' + new Date().getTime()
+			, dashdash = '--'
+			, crlf = '\r\n'
+			, multipart = ''
+			, I = this.getRuntime()
 			;
 
-			if (rawInfo.meta) {
-				Basic.each(grps, function(grp) {
-					var meta = rawInfo.meta[grp]
-					, tag
-					, i
-					, length
-					, value
-					;
-					if (meta && meta.keys) {
-						info.meta[grp] = {};
-						for (i = 0, length = meta.keys.length; i < length; i++) {
-							tag = meta.keys[i];
-							value = meta[tag];
-							if (value) {
-								// convert numbers
-								if (/^(\d|[1-9]\d+)$/.test(value)) { // integer (make sure doesn't start with zero)
-									value = parseInt(value, 10);
-								} else if (/^\d*\.\d+$/.test(value)) { // double
-									value = parseFloat(value);
-								}
-								info.meta[grp][tag] = value;
-							}
-						}
-					}
-				});
-
-				// save thumb data as blob
-				if (info.meta && info.meta.thumb && info.meta.thumb.data && !(self.meta.thumb.data instanceof Blob)) {
-					info.meta.thumb.data = new Blob(self.uid, info.meta.thumb.data);
-				}
+			if (!I.can('send_binary_string')) {
+				throw new x.RuntimeError(x.RuntimeError.NOT_SUPPORTED_ERR);
 			}
 
-			info.width = parseInt(rawInfo.width, 10);
-			info.height = parseInt(rawInfo.height, 10);
-			info.size = parseInt(rawInfo.size, 10);
-			info.type = rawInfo.type;
-			info.name = rawInfo.name;
+			_xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
 
-			return info;
-		},
+			// append multipart parameters
+			fd.each(function(value, name) {
+				// Firefox 3.6 failed to convert multibyte characters to UTF-8 in sendAsBinary(), 
+				// so we try it here ourselves with: unescape(encodeURIComponent(value))
+				if (value instanceof Blob) {
+					// Build RFC2388 blob
+					multipart += dashdash + boundary + crlf +
+						'Content-Disposition: form-data; name="' + name + '"; filename="' + unescape(encodeURIComponent(value.name || 'blob')) + '"' + crlf +
+						'Content-Type: ' + (value.type || 'application/octet-stream') + crlf + crlf +
+						value.getSource() + crlf;
+				} else {
+					multipart += dashdash + boundary + crlf +
+						'Content-Disposition: form-data; name="' + name + '"' + crlf + crlf +
+						unescape(encodeURIComponent(value)) + crlf;
+				}
+			});
 
-		resize: function(rect, ratio, opts) {
-			this.getRuntime().shimExec.call(this, 'Image', 'resize', rect.x, rect.y, rect.width, rect.height, ratio, opts.preserveHeaders, opts.resample);
+			multipart += dashdash + boundary + dashdash + crlf;
+
+			return multipart;
 		}
-	}));
+	}
+
+	return (extensions.XMLHttpRequest = XMLHttpRequest);
 });
 
-// Included from: src/javascript/runtime/html4/Runtime.js
+// Included from: src/javascript/core/utils/Loader.js
+
+/**
+ * Loader.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/core/utils/Loader
+@private
+*/
+define("moxie/core/utils/Loader", [
+	"moxie/core/utils/Basic"
+], function(Basic) {
+
+	var loadScript = function(url, cb, attrs) {
+		var head, script, cbCalled = false;
+
+		head = document.getElementsByTagName('head')[0];
+		script = document.createElement('script');
+		script.type = 'text/javascript';
+
+		script.onreadystatechange = function () {
+			if (this.readyState == 'complete' && !cbCalled) {
+				cbCalled = true;
+				cb();
+			}
+		}
+		
+		script.onload = function() {
+			if (!cbCalled) {
+				cbCalled = true;
+				cb();
+			}
+		};
+
+		if (typeof(attrs) === 'object') {
+			Basic.each(attrs, function(value, key) {
+				script.setAttribute(key, value);
+			});
+		}
+
+		script.src = url;
+		
+		head.appendChild(script);
+		return script;
+	};
+
+
+	var interpolateProgress = function(loaded, total, partNum, totalParts) {
+		var partSize = total / totalParts;
+		return Math.ceil((partNum - 1) * partSize + partSize * loaded / total);
+	};
+
+	
+	return {
+		loadScript: loadScript,
+		interpolateProgress: interpolateProgress
+	};
+});
+
+// Included from: src/javascript/runtime/googledrive/Runtime.js
 
 /**
  * Runtime.js
@@ -11047,90 +9757,61 @@ define("moxie/runtime/silverlight/image/Image", [
 /*global File:true */
 
 /**
-Defines constructor for HTML4 runtime.
+Defines constructor for GoogleDrive runtime.
 
-@class moxie/runtime/html4/Runtime
+@class moxie/runtime/googledrive/Runtime
 @private
 */
-define("moxie/runtime/html4/Runtime", [
+define("moxie/runtime/googledrive/Runtime", [
+	"moxie/runtime/Runtime",
+	"moxie/runtime/html5/Runtime",
 	"moxie/core/utils/Basic",
 	"moxie/core/Exceptions",
-	"moxie/runtime/Runtime",
-	"moxie/core/utils/Env"
-], function(Basic, x, Runtime, Env) {
+	"moxie/core/utils/Loader"
+], function(Runtime, html5Extensions, Basic, x, Loader) {
 	
-	var type = 'html4', extensions = {};
+	var type = "googledrive", extensions = {}, Html5Runtime = Runtime.getConstructor('html5');
 
-	function Html4Runtime(options) {
-		var I = this
-		, Test = Runtime.capTest
-		, True = Runtime.capTrue
-		;
 
-		Runtime.call(this, options, type, {
-			access_binary: Test(window.FileReader || window.File && File.getAsDataURL),
-			access_image_binary: false,
-			display_media: Test(
-				(Env.can('create_canvas') || Env.can('use_data_uri_over32kb')) && 
-				defined('moxie/image/Image')
-			),
-			do_cors: false,
-			drag_and_drop: false,
-			filter_by_extension: Test(function() { // if you know how to feature-detect this, please suggest
-				return !(
-					(Env.browser === 'Chrome' && Env.verComp(Env.version, 28, '<')) || 
-					(Env.browser === 'IE' && Env.verComp(Env.version, 10, '<')) || 
-					(Env.browser === 'Safari' && Env.verComp(Env.version, 7, '<')) ||
-					(Env.browser === 'Firefox' && Env.verComp(Env.version, 37, '<'))
-				);
-			}()),
-			resize_image: function() {
-				return extensions.Image && I.can('access_binary') && Env.can('create_canvas');
-			},
-			report_upload_progress: false,
-			return_response_headers: false,
-			return_response_type: function(responseType) {
-				if (responseType === 'json' && !!window.JSON) {
-					return true;
-				} 
-				return !!~Basic.inArray(responseType, ['text', 'document', '']);
-			},
-			return_status_code: function(code) {
-				return !Basic.arrayDiff(code, [200, 404]);
-			},
-			select_file: function() {
-				return Env.can('use_fileinput');
-			},
-			select_multiple: false,
-			send_binary_string: false,
-			send_custom_headers: false,
-			send_multipart: true,
-			slice_blob: false,
-			stream_upload: function() {
-				return I.can('select_file');
-			},
-			summon_file_dialog: function() { // yeah... some dirty sniffing here...
-				return I.can('select_file') && !(
-					(Env.browser === 'Firefox' && Env.verComp(Env.version, 4, '<')) ||
-					(Env.browser === 'Opera' && Env.verComp(Env.version, 12, '<')) ||
-					(Env.browser === 'IE' && Env.verComp(Env.version, 10, '<'))
-				);
-			},
-			upload_filesize: True,
-			use_http_method: function(methods) {
-				return !Basic.arrayDiff(methods, ['GET', 'POST']);
-			}
-		});
+	function GoogleDriveRuntime(options) {
+		var I = this, gapiEls = [];
 
+		Html5Runtime.call(this, options, type);
 
 		Basic.extend(this, {
 			init : function() {
-				this.trigger("Init");
+				Basic.inSeries([
+					function(cb) {
+						gapiEls.push(Loader.loadScript("https://apis.google.com/js/api.js", cb));
+					},
+
+					function(cb) {
+						gapiEls.push(Loader.loadScript("https://apis.google.com/js/client.js", cb));
+					},
+
+					function(cb) {
+						gapi.load('auth', { callback: cb });
+					},
+
+					function(cb) {
+						gapi.client.load('drive', 'v2', cb);
+					} 
+				], function(err) {
+					if (err) {
+						this.mode = false;
+					}
+
+					I.trigger("Init");
+				});
 			},
 
 			destroy: (function(destroy) { // extend default destroy method
 				return function() {
 					destroy.call(I);
+					Basic.each(gapiEls, function(gapiEl) {
+						gapiEl.parentNode.removeChild(gapiEl); // remove script
+					});
+					gapiEls = [];
 					destroy = I = null;
 				};
 			}(this.destroy))
@@ -11139,12 +9820,12 @@ define("moxie/runtime/html4/Runtime", [
 		Basic.extend(this.getShim(), extensions);
 	}
 
-	Runtime.addConstructor(type, Html4Runtime);
+	Runtime.addConstructor(type, GoogleDriveRuntime);
 
 	return extensions;
 });
 
-// Included from: src/javascript/runtime/html4/file/FileInput.js
+// Included from: src/javascript/runtime/googledrive/file/FileInput.js
 
 /**
  * FileInput.js
@@ -11157,11 +9838,11 @@ define("moxie/runtime/html4/Runtime", [
  */
 
 /**
-@class moxie/runtime/html4/file/FileInput
+@class moxie/runtime/googledrive/file/FileInput
 @private
 */
-define("moxie/runtime/html4/file/FileInput", [
-	"moxie/runtime/html4/Runtime",
+define("moxie/runtime/googledrive/file/FileInput", [
+	"moxie/runtime/googledrive/Runtime",
 	"moxie/file/File",
 	"moxie/core/utils/Basic",
 	"moxie/core/utils/Dom",
@@ -11169,240 +9850,129 @@ define("moxie/runtime/html4/file/FileInput", [
 	"moxie/core/utils/Mime",
 	"moxie/core/utils/Env"
 ], function(extensions, File, Basic, Dom, Events, Mime, Env) {
-	
+
 	function FileInput() {
-		var _uid, _mimes = [], _options, _browseBtnZIndex; // save original z-index;
+		var _picker, _options, _disabled = false;
 
-		function addInput() {
-			var comp = this, I = comp.getRuntime(), shimContainer, browseButton, currForm, form, input, uid;
+		function createPicker(cb) {
+			var comp = this
+			, I = comp.getRuntime()
+			, scope = ['https://www.googleapis.com/auth/drive.readonly']
+			;
 
-			uid = Basic.guid('uid_');
-
-			shimContainer = I.getShimContainer(); // we get new ref every time to avoid memory leaks in IE
-
-			if (_uid) { // move previous form out of the view
-				currForm = Dom.get(_uid + '_form');
-				if (currForm) {
-					Basic.extend(currForm.style, { top: '100%' });
-					// it shouldn't be possible to tab into the hidden element
-					currForm.firstChild.setAttribute('tabindex', -1);
-				}
-			}
-
-			// build form in DOM, since innerHTML version not able to submit file for some reason
-			form = document.createElement('form');
-			form.setAttribute('id', uid + '_form');
-			form.setAttribute('method', 'post');
-			form.setAttribute('enctype', 'multipart/form-data');
-			form.setAttribute('encoding', 'multipart/form-data');
-
-			Basic.extend(form.style, {
-				overflow: 'hidden',
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				width: '100%',
-				height: '100%'
-			});
-
-			input = document.createElement('input');
-			input.setAttribute('id', uid);
-			input.setAttribute('type', 'file');
-			input.setAttribute('accept', _mimes.join(','));
-
-			if (I.can('summon_file_dialog')) {
-				input.setAttribute('tabindex', -1);
-			}
-
-			Basic.extend(input.style, {
-				fontSize: '999px',
-				opacity: 0
-			});
-
-			form.appendChild(input);
-			shimContainer.appendChild(form);
-
-			// prepare file input to be placed underneath the browse_button element
-			Basic.extend(input.style, {
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				width: '100%',
-				height: '100%'
-			});
-
-			if (Env.browser === 'IE' && Env.verComp(Env.version, 10, '<')) {
-				Basic.extend(input.style, {
-					filter : "progid:DXImageTransform.Microsoft.Alpha(opacity=0)"
-				});
-			}
-
-			input.onchange = function() { // there should be only one handler for this
-				var file;
-
-				if (!this.value) {
+			gapi.auth.authorize({
+				'client_id': _options.googledrive.clientId,
+				'scope': scope,
+				'immediate': false
+			}, function(authResult) {
+				if (!authResult || authResult.error) {
 					return;
 				}
 
-				if (this.files) { // check if browser is fresh enough
-					file = this.files[0];
-				} else {
-					file = {
-						name: this.value
-					};
+				var PickerBuilder = new google.picker.PickerBuilder()
+					.addView(google.picker.ViewId.DOCS)
+					.setOAuthToken(authResult.access_token)
+					.setDeveloperKey(_options.googledrive.apiKey)
+					;
+
+				if (_options.multiple) {
+					PickerBuilder.enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
 				}
 
-				file = new File(I.uid, file);
+				PickerBuilder.setCallback(function(data) {
+					var queue = [];
 
-				// clear event handler
-				this.onchange = function() {}; 
-				addInput.call(comp); 
+					comp.files = [];
 
-				comp.files = [file];
+					if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+						// get minimal file info
+						Basic.each(data[google.picker.Response.DOCUMENTS], function(doc) {
+							queue.push(function(cb) {
+								gapi.client.drive.files.get({
+									fileId: doc.id
+								})
+								.execute(function(r) {
+									comp.files.push(new File(I.uid, {
+										name: r.originalFilename,
+										type: r.mimeType,
+										size: parseInt(r.fileSize, 10),
+										lastModifiedDate: r.modifiedDate,
+										gdid: r.id,
+										downloadUrl: r.downloadUrl,
+										thumbnail: r.thumbnailLink,
+										resource: r
+									}));
+									cb();
+								});
+							});
+						});
 
-				// substitute all ids with file uids (consider file.uid read-only - we cannot do it the other way around)
-				input.setAttribute('id', file.uid);
-				form.setAttribute('id', file.uid + '_form');
-				
-				comp.trigger('change');
-
-				input = form = null;
-			};
-
-
-			// route click event to the input
-			if (I.can('summon_file_dialog')) {
-				browseButton = Dom.get(_options.browse_button);
-				Events.removeEvent(browseButton, 'click', comp.uid);
-				Events.addEvent(browseButton, 'click', function(e) {
-					if (input && !input.disabled) { // for some reason FF (up to 8.0.1 so far) lets to click disabled input[type=file]
-						input.click();
+						Basic.inParallel(queue, function(err) {
+							if (!err && comp.files.length) {
+								comp.trigger('change');
+							}
+						});
 					}
-					e.preventDefault();
-				}, comp.uid);
-			}
+				});
 
-			_uid = uid;
+				_picker = PickerBuilder.build();
 
-			shimContainer = currForm = browseButton = null;
+				cb();
+			});
 		}
 
 		Basic.extend(this, {
 			init: function(options) {
-				var comp = this, I = comp.getRuntime(), shimContainer;
+				var comp = this, I = comp.getRuntime(), input, shimContainer, mimes, browseButton, zIndex, top;
+
+				_options = options;
 
 				// figure out accept string
-				_options = options;
-				_mimes = Mime.extList2mimes(options.accept, I.can('filter_by_extension'));
+				mimes = Mime.extList2mimes(_options.accept, I.can('filter_by_extension'));
 
-				shimContainer = I.getShimContainer();
+				gapi.load('picker', {
+					callback: function() {
+						Events.addEvent(Dom.get(_options.browse_button), 'click', function(e) {
+							if (_disabled) {
+								return;
+							}
 
-				(function() {
-					var browseButton, zIndex, top;
+							if (_picker) {
+								_picker.setVisible(true);
+							} else {
+								createPicker.call(comp, function() {
+									_picker.setVisible(true);
+								});
+							}
+							e.preventDefault();
+						}, comp.uid);
 
-					browseButton = Dom.get(options.browse_button);
-					_browseBtnZIndex = Dom.getStyle(browseButton, 'z-index') || 'auto';
-
-					// Route click event to the input[type=file] element for browsers that support such behavior
-					if (I.can('summon_file_dialog')) {
-						if (Dom.getStyle(browseButton, 'position') === 'static') {
-							browseButton.style.position = 'relative';
-						}						
-
-						comp.bind('Refresh', function() {
-							zIndex = parseInt(_browseBtnZIndex, 10) || 1;
-
-							Dom.get(_options.browse_button).style.zIndex = zIndex;
-							this.getRuntime().getShimContainer().style.zIndex = zIndex - 1;
+						comp.trigger({
+							type: 'ready',
+							async: true
 						});
-					} else {
-						// it shouldn't be possible to tab into the hidden element
-						browseButton.setAttribute('tabindex', -1);
 					}
-
-					/* Since we have to place input[type=file] on top of the browse_button for some browsers,
-					browse_button loses interactivity, so we restore it here */
-					top = I.can('summon_file_dialog') ? browseButton : shimContainer;
-
-					Events.addEvent(top, 'mouseover', function() {
-						comp.trigger('mouseenter');
-					}, comp.uid);
-
-					Events.addEvent(top, 'mouseout', function() {
-						comp.trigger('mouseleave');
-					}, comp.uid);
-
-					Events.addEvent(top, 'mousedown', function() {
-						comp.trigger('mousedown');
-					}, comp.uid);
-
-					Events.addEvent(Dom.get(options.container), 'mouseup', function() {
-						comp.trigger('mouseup');
-					}, comp.uid);
-
-					browseButton = null;
-				}());
-
-				addInput.call(this);
-
-				shimContainer = null;
-
-				// trigger ready event asynchronously
-				comp.trigger({
-					type: 'ready',
-					async: true
 				});
-			},
-
-			setOption: function(name, value) {
-				var I = this.getRuntime();
-				var input;
-
-				if (name == 'accept') {
-					_mimes = value.mimes || Mime.extList2mimes(value, I.can('filter_by_extension'));
-				}
-
-				// update current input
-				input = Dom.get(_uid)
-				if (input) {
-					input.setAttribute('accept', _mimes.join(','));
-				}
 			},
 
 
 			disable: function(state) {
-				var input;
-
-				if ((input = Dom.get(_uid))) {
-					input.disabled = !!state;
-				}
+				_disabled = state;
 			},
+
 
 			destroy: function() {
 				var I = this.getRuntime()
 				, shim = I.getShim()
-				, shimContainer = I.getShimContainer()
-				, container = _options && Dom.get(_options.container)
-				, browseButton = _options && Dom.get(_options.browse_button)
 				;
-				
-				if (container) {
-					Events.removeAllEvents(container, this.uid);
-				}
-				
-				if (browseButton) {
-					Events.removeAllEvents(browseButton, this.uid);
-					browseButton.style.zIndex = _browseBtnZIndex; // reset to original value
-				}
-				
-				if (shimContainer) {
-					Events.removeAllEvents(shimContainer, this.uid);
-					shimContainer.innerHTML = '';
-				}
+
+				Events.removeAllEvents(_options && Dom.get(_options.browse_button), this.uid);
 
 				shim.removeInstance(this.uid);
 
-				_uid = _mimes = _options = shimContainer = container = browseButton = shim = null;
+				// destroy _picker
+
+				_options = shim = null;
 			}
 		});
 	}
@@ -11410,7 +9980,7 @@ define("moxie/runtime/html4/file/FileInput", [
 	return (extensions.FileInput = FileInput);
 });
 
-// Included from: src/javascript/runtime/html4/file/FileReader.js
+// Included from: src/javascript/runtime/googledrive/file/FileReader.js
 
 /**
  * FileReader.js
@@ -11423,17 +9993,99 @@ define("moxie/runtime/html4/file/FileInput", [
  */
 
 /**
-@class moxie/runtime/html4/file/FileReader
+@class moxie/runtime/googledrive/file/FileReader
 @private
 */
-define("moxie/runtime/html4/file/FileReader", [
-	"moxie/runtime/html4/Runtime",
-	"moxie/runtime/html5/file/FileReader"
-], function(extensions, FileReader) {
+define("moxie/runtime/googledrive/file/FileReader", [
+	"moxie/runtime/googledrive/Runtime",
+	"moxie/core/utils/Encode",
+	"moxie/core/utils/Basic"
+], function(extensions, Encode, Basic) {
+	
+	function FileReader() {
+		var self = this, _fr, _xhr, _convertToBinary = false;
+
+		Basic.extend(this, {
+
+			read: function(op, blob) {
+				var comp = this;
+
+				comp.result = '';
+
+				blob = blob.getSource();
+
+				_xhr = new window.XMLHttpRequest();
+				_xhr.open('GET', blob.downloadUrl);
+				
+				if ('gapi' in window) {
+					_xhr.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+				}
+
+				if (blob.range) {
+					_xhr.setRequestHeader('Range', 'bytes=' + blob.range[0] + '-' + (blob.range[1] - 1));
+				}
+
+				_xhr.responseType = 'blob';
+				
+				_xhr.onprogress = function(e) {
+					comp.trigger(e);
+				};
+
+				_xhr.onload = function(e) {
+					_fr = new window.FileReader();
+
+					_fr.onload = function(e) {
+						comp.result = _convertToBinary ? _toBinary(_fr.result) : _fr.result;
+						comp.trigger(e);
+					};
+
+					_fr.onloadend = function() {
+						self.destroy();
+						comp.trigger(e);
+					};
+
+					if (Basic.typeOf(_fr[op]) === 'function') {
+						_convertToBinary = false;
+						_fr[op](this.response);
+					} else if (op === 'readAsBinaryString') { // readAsBinaryString is depricated in general and never existed in IE10+
+						_convertToBinary = true;
+						_fr.readAsDataURL(this.response);
+					}
+				};
+
+				_xhr.onerror = function(e) {
+					comp.trigger(e);
+				};
+
+				_xhr.send();
+			},
+
+
+			abort: function() {
+				if (_xhr) {
+					_xhr.abort();
+				}
+
+				if (_fr) {
+					_fr.abort();
+				}
+			},
+
+			destroy: function() {
+				self = _xhr = _fr = null;
+				this.getRuntime().getShim().removeInstance(this.uid);
+			}
+		});
+
+		function _toBinary(str) {
+			return Encode.atob(str.substring(str.indexOf('base64,') + 7));
+		}
+	}
+
 	return (extensions.FileReader = FileReader);
 });
 
-// Included from: src/javascript/runtime/html4/xhr/XMLHttpRequest.js
+// Included from: src/javascript/runtime/googledrive/xhr/XMLHttpRequest.js
 
 /**
  * XMLHttpRequest.js
@@ -11446,235 +10098,92 @@ define("moxie/runtime/html4/file/FileReader", [
  */
 
 /**
-@class moxie/runtime/html4/xhr/XMLHttpRequest
+@class moxie/runtime/googledrive/xhr/XMLHttpRequest
 @private
 */
-define("moxie/runtime/html4/xhr/XMLHttpRequest", [
-	"moxie/runtime/html4/Runtime",
+define("moxie/runtime/googledrive/xhr/XMLHttpRequest", [
+	"moxie/runtime/googledrive/Runtime",
+	"moxie/runtime/html5/xhr/XMLHttpRequest",
+	"moxie/file/File",
+	"moxie/file/FileReader",
+	"moxie/runtime/googledrive/file/FileReader",
+	"moxie/xhr/FormData",
 	"moxie/core/utils/Basic",
-	"moxie/core/utils/Dom",
-	"moxie/core/utils/Url",
 	"moxie/core/Exceptions",
-	"moxie/core/utils/Events",
-	"moxie/file/Blob",
-	"moxie/xhr/FormData"
-], function(extensions, Basic, Dom, Url, x, Events, Blob, FormData) {
+	"moxie/runtime/RuntimeTarget",
+	"moxie/core/utils/Loader"
+], function(extensions, Html5XHR, File, FileReader, GoogleDriveFileReader, FormData, Basic, x, RuntimeTarget, Loader) {
 	
 	function XMLHttpRequest() {
-		var _status, _response, _iframe;
+		var self = this;
 
-		function cleanup(cb) {
-			var target = this, uid, form, inputs, i, hasFile = false;
+		Html5XHR.call(this);
 
-			if (!_iframe) {
-				return;
-			}
-
-			uid = _iframe.id.replace(/_iframe$/, '');
-
-			form = Dom.get(uid + '_form');
-			if (form) {
-				inputs = form.getElementsByTagName('input');
-				i = inputs.length;
-
-				while (i--) {
-					switch (inputs[i].getAttribute('type')) {
-						case 'hidden':
-							inputs[i].parentNode.removeChild(inputs[i]);
-							break;
-						case 'file':
-							hasFile = true; // flag the case for later
-							break;
-					}
-				}
-				inputs = [];
-
-				if (!hasFile) { // we need to keep the form for sake of possible retries
-					form.parentNode.removeChild(form);
-				}
-				form = null;
-			}
-
-			// without timeout, request is marked as canceled (in console)
-			setTimeout(function() {
-				Events.removeEvent(_iframe, 'load', target.uid);
-				if (_iframe.parentNode) { // #382
-					_iframe.parentNode.removeChild(_iframe);
-				}
-
-				// check if shim container has any other children, if - not, remove it as well
-				var shimContainer = target.getRuntime().getShimContainer();
-				if (!shimContainer.children.length) {
-					shimContainer.parentNode.removeChild(shimContainer);
-				}
-
-				shimContainer = _iframe = null;
-				cb();
-			}, 1);
-		}
+		var Html5Send = this.send;
 
 		Basic.extend(this, {
 			send: function(meta, data) {
-				var target = this, I = target.getRuntime(), uid, form, input, blob;
+				var target = this, file, fr, xhr;
 
-				_status = _response = null;
-
-				function createIframe() {
-					var container = I.getShimContainer() || document.body
-					, temp = document.createElement('div')
-					;
-
-					// IE 6 won't be able to set the name using setAttribute or iframe.name
-					temp.innerHTML = '<iframe id="' + uid + '_iframe" name="' + uid + '_iframe" src="javascript:&quot;&quot;" style="display:none"></iframe>';
-					_iframe = temp.firstChild;
-					container.appendChild(_iframe);
-
-					/* _iframe.onreadystatechange = function() {
-						console.info(_iframe.readyState);
-					};*/
-
-					Events.addEvent(_iframe, 'load', function() { // _iframe.onload doesn't work in IE lte 8
-						var el;
-
-						try {
-							el = _iframe.contentWindow.document || _iframe.contentDocument || window.frames[_iframe.id].document;
-
-							// try to detect some standard error pages
-							if (/^4(0[0-9]|1[0-7]|2[2346])\s/.test(el.title)) { // test if title starts with 4xx HTTP error
-								_status = el.title.replace(/^(\d+).*$/, '$1');
-							} else {
-								_status = 200;
-								// get result
-								_response = Basic.trim(el.body.innerHTML);
-
-								// we need to fire these at least once
-								target.trigger({
-									type: 'progress',
-									loaded: _response.length,
-									total: _response.length
-								});
-
-								if (blob) { // if we were uploading a file
-									target.trigger({
-										type: 'uploadprogress',
-										loaded: blob.size || 1025,
-										total: blob.size || 1025
-									});
-								}
-							}
-						} catch (ex) {
-							if (Url.hasSameOrigin(meta.url)) {
-								// if response is sent with error code, iframe in IE gets redirected to res://ieframe.dll/http_x.htm
-								// which obviously results to cross domain error (wtf?)
-								_status = 404;
-							} else {
-								cleanup.call(target, function() {
-									target.trigger('error');
-								});
-								return;
-							}
-						}	
-					
-						cleanup.call(target, function() {
-							target.trigger('load');
-						});
-					}, target.uid);
-				} // end createIframe
-
-				// prepare data to be sent and convert if required
 				if (data instanceof FormData && data.hasBlob()) {
-					blob = data.getBlob();
-					uid = blob.uid;
-					input = Dom.get(uid);
-					form = Dom.get(uid + '_form');
-					if (!form) {
-						throw new x.DOMException(x.DOMException.NOT_FOUND_ERR);
-					}
-				} else {
-					uid = Basic.guid('uid_');
+					file = data.getBlob();
 
-					form = document.createElement('form');
-					form.setAttribute('id', uid + '_form');
-					form.setAttribute('method', meta.method);
-					form.setAttribute('enctype', 'multipart/form-data');
-					form.setAttribute('encoding', 'multipart/form-data');
+					fr = new FileReader();
 
-					I.getShimContainer().appendChild(form);
-				}
+					fr.onprogress = function(e) {
+						target.trigger({
+							type: 'UploadProgress',
+							loaded: Loader.interpolateProgress(e.loaded, e.total, 1, 2),
+							total: e.total
+						});
+					};
 
-				// set upload target
-				form.setAttribute('target', uid + '_iframe');
+					fr.onload = function() {
+						data.append(data.getBlobName(), new File(null, {
+							name: file.name || '',
+							type: file.type,
+							size: file.size,
+							lastModifiedDate: file.lastModifiedDate,
+							data: this.result
+						}));
 
-				if (data instanceof FormData) {
-					data.each(function(value, name) {
-						if (value instanceof Blob) {
-							if (input) {
-								input.setAttribute('name', name);
-							}
-						} else {
-							var hidden = document.createElement('input');
+						file.destroy();
 
-							Basic.extend(hidden, {
-								type : 'hidden',
-								name : name,
-								value : value
+						// we are going to intercept progress events (and inevitably some others) for smoother feedback
+						xhr = new RuntimeTarget();
+
+						xhr.bind('LoadStart Progress Abort Error', function(e) {
+							target.trigger(e);
+						});
+
+						xhr.bind('UploadProgress', function(e) {
+							target.trigger({
+								type: 'UploadProgress',
+								loaded: Loader.interpolateProgress(e.loaded, e.total, 2, 2),
+								total: e.total
 							});
+						});
 
-							// make sure that input[type="file"], if it's there, comes last
-							if (input) {
-								form.insertBefore(hidden, input);
-							} else {
-								form.appendChild(hidden);
-							}
-						}
-					});
+						xhr.bind('Load', function(e) {
+							target.trigger(e);
+						});
+
+						xhr.bind('RuntimeInit', function(e, runtime) {
+							Html5Send.call(xhr, meta, data);
+						});
+
+						xhr.bind('RuntimeError', function(e, err) {
+							target.dispatchEvent('RuntimeError', err);
+						});
+
+						xhr.connectRuntime({
+							runtime_order: 'html5'
+						});
+					};
+
+					fr.readAsBinaryString(file);
 				}
 
-				// set destination url
-				form.setAttribute("action", meta.url);
-
-				createIframe();
-				form.submit();
-				target.trigger('loadstart');
-			},
-
-			getStatus: function() {
-				return _status;
-			},
-
-			getResponse: function(responseType) {
-				if ('json' === responseType) {
-					// strip off <pre>..</pre> tags that might be enclosing the response
-					if (Basic.typeOf(_response) === 'string' && !!window.JSON) {
-						try {
-							return JSON.parse(_response.replace(/^\s*<pre[^>]*>/, '').replace(/<\/pre>\s*$/, ''));
-						} catch (ex) {
-							return null;
-						}
-					} 
-				} else if ('document' === responseType) {
-
-				}
-				return _response;
-			},
-
-			abort: function() {
-				var target = this;
-
-				if (_iframe && _iframe.contentWindow) {
-					if (_iframe.contentWindow.stop) { // FireFox/Safari/Chrome
-						_iframe.contentWindow.stop();
-					} else if (_iframe.contentWindow.document.execCommand) { // IE
-						_iframe.contentWindow.document.execCommand('Stop');
-					} else {
-						_iframe.src = "about:blank";
-					}
-				}
-
-				cleanup.call(this, function() {
-					// target.dispatchEvent('readystatechange');
-					target.dispatchEvent('abort');
-				});
 			},
 
 			destroy: function() {
@@ -11686,10 +10195,122 @@ define("moxie/runtime/html4/xhr/XMLHttpRequest", [
 	return (extensions.XMLHttpRequest = XMLHttpRequest);
 });
 
-// Included from: src/javascript/runtime/html4/image/Image.js
+// Included from: src/javascript/runtime/dropbox/Runtime.js
 
 /**
- * Image.js
+ * Runtime.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/*global window:true */
+
+/**
+Defines constructor for Dropbox runtime.
+
+@class moxie/runtime/dropbox/Runtime
+@private
+*/
+define("moxie/runtime/dropbox/Runtime", [
+	"moxie/runtime/Runtime",
+	"moxie/core/utils/Basic",
+	"moxie/core/Exceptions",
+	"moxie/core/utils/Env",
+	"moxie/core/utils/Loader"
+], function(Runtime, Basic, x, Env, Loader) {
+	
+	var type = "dropbox", extensions = {};
+
+
+	function DropboxRuntime(options) {
+		var I = this
+		, Test = Runtime.capTest
+		, True = Runtime.capTrue
+		, script
+		;
+
+		var caps = Basic.extend({
+				access_binary: Test(window.FileReader || window.File && window.File.getAsDataURL),
+				access_image_binary: function() {
+					return I.can('access_binary') && !!extensions.Image;
+				},
+				display_media: Test(
+					(Env.can('create_canvas') || Env.can('use_data_uri_over32kb')) && 
+					defined('moxie/image/Image')
+				),
+				do_cors: Test(window.XMLHttpRequest && 'withCredentials' in new XMLHttpRequest()),
+				drag_and_drop: false,
+				filter_by_extension: True,
+				return_response_headers: True,
+				return_response_type: function(responseType) {
+					if (responseType === 'json' && !!window.JSON) { // we can fake this one even if it's not supported
+						return true;
+					} 
+					return Env.can('return_response_type', responseType);
+				},
+				return_status_code: True,
+				report_upload_progress: Test(window.XMLHttpRequest && new XMLHttpRequest().upload),
+				resize_image: function() {
+					return I.can('access_binary') && Env.can('create_canvas');
+				},
+				select_file: true,
+				select_folder: false,
+				select_multiple: True,
+				send_binary_string: Test(window.XMLHttpRequest && (new XMLHttpRequest().sendAsBinary || (window.Uint8Array && window.ArrayBuffer))),
+				send_custom_headers: Test(window.XMLHttpRequest),
+				send_multipart: function() {
+					return !!(window.XMLHttpRequest && new XMLHttpRequest().upload && window.FormData) || I.can('send_binary_string');
+				},
+				slice_blob: Test(window.File && (File.prototype.mozSlice || File.prototype.webkitSlice || File.prototype.slice)),
+				stream_upload: function(){
+					return I.can('slice_blob') && I.can('send_multipart');
+				},
+				summon_file_dialog: True,
+				upload_filesize: True
+			}
+		);
+
+		Runtime.call(this, options, (arguments[1] || type), caps);
+
+		Basic.extend(this, {
+			init : function() {
+				script = Loader.loadScript("https://www.dropbox.com/static/api/1/dropins.js", function() {
+					if (Dropbox.isBrowserSupported()) {
+						I.trigger("Init");
+					} else {
+						I.trigger("Error", new x.RuntimeError(x.RuntimeError.NOT_INIT_ERR));
+					}
+				}, {
+					"id": 'dropboxjs',
+					"data-app-key": options.dropbox.appKey
+				});					
+			},
+
+			destroy: (function(destroy) { // extend default destroy method
+				return function() {
+					destroy.call(I);
+					script.parentNode.removeChild(script); // remove script
+					destroy = I = null;
+				};
+			}(this.destroy))
+		});
+
+		Basic.extend(this.getShim(), extensions);
+	}
+
+	Runtime.addConstructor(type, DropboxRuntime);
+
+	return extensions;
+});
+
+// Included from: src/javascript/runtime/dropbox/file/FileInput.js
+
+/**
+ * FileInput.js
  *
  * Copyright 2013, Moxiecode Systems AB
  * Released under GPL License.
@@ -11699,16 +10320,160 @@ define("moxie/runtime/html4/xhr/XMLHttpRequest", [
  */
 
 /**
-@class moxie/runtime/html4/image/Image
+@class moxie/runtime/dropbox/file/FileInput
 @private
 */
-define("moxie/runtime/html4/image/Image", [
-	"moxie/runtime/html4/Runtime",
-	"moxie/runtime/html5/image/Image"
-], function(extensions, Image) {
-	return (extensions.Image = Image);
+define("moxie/runtime/dropbox/file/FileInput", [
+	"moxie/runtime/dropbox/Runtime",
+	"moxie/file/File",
+	"moxie/core/utils/Basic",
+	"moxie/core/utils/Dom",
+	"moxie/core/utils/Events",
+	"moxie/core/utils/Mime",
+	"moxie/core/utils/Env"
+], function(extensions, File, Basic, Dom, Events, Mime, Env) {
+
+	function FileInput() {
+		var _options, _disabled = false;
+
+		Basic.extend(this, {
+			init: function(options) {
+				var comp = this, I = comp.getRuntime(), config, exts = [];
+
+				_options = options;
+
+				Basic.each(_options.accept, function(group) {
+					if (/\*/.test(group.extensions)) {
+						exts = [];
+						return false;
+					}
+
+					var items = group.extensions.split(/\s*,\s*/);
+					if (!items.length) {
+						return true; // continue
+					}
+
+					// prefix extensions with dots
+					[].push.apply(exts, ('.' + items.join(',.')).split(','));
+				});
+
+
+				config = {
+					//iframe: true, // potentially there, but not working
+					linkType: 'direct',
+					extensions: exts,
+
+					success: function(files) {
+						comp.files = [];
+
+						Basic.each(files, function(file) {
+							comp.files.push(new File(I.uid, {
+								name: file.name,
+								size: parseInt(file.bytes, 10),
+								downloadUrl: file.link,
+								thumbnail: file.thumbnailLink
+							}));
+						});
+
+						if (comp.files.length) {
+							comp.trigger('change');
+						}
+					}
+				};
+
+				if (_options.multiple) {
+					config.multiselect = true;
+				}
+				
+
+				Events.addEvent(Dom.get(_options.browse_button), 'click', function(e) {
+					if (_disabled) {
+						return;
+					}
+
+					Dropbox.choose(config);
+
+					e.preventDefault();
+				}, comp.uid);
+
+				comp.trigger({
+					type: 'ready',
+					async: true
+				});
+			},
+
+
+			disable: function(state) {
+				_disabled = state;
+			},
+
+
+			destroy: function() {
+				var I = this.getRuntime()
+				, shim = I.getShim()
+				;
+
+				Events.removeAllEvents(_options && Dom.get(_options.browse_button), this.uid);
+
+				shim.removeInstance(this.uid);
+
+				// destroy _picker
+
+				_options = shim = null;
+			}
+		});
+	}
+
+	return (extensions.FileInput = FileInput);
 });
 
-expose(["moxie/core/utils/Basic","moxie/core/utils/Encode","moxie/core/utils/Env","moxie/core/Exceptions","moxie/core/utils/Dom","moxie/core/EventTarget","moxie/runtime/Runtime","moxie/runtime/RuntimeClient","moxie/file/Blob","moxie/core/I18n","moxie/core/utils/Mime","moxie/file/FileInput","moxie/file/File","moxie/file/FileDrop","moxie/file/FileReader","moxie/core/utils/Url","moxie/runtime/RuntimeTarget","moxie/xhr/FormData","moxie/xhr/XMLHttpRequest","moxie/image/Image","moxie/core/utils/Events","moxie/runtime/html5/image/ResizerCanvas"]);
+// Included from: src/javascript/runtime/dropbox/file/FileReader.js
+
+/**
+ * FileReader.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/runtime/dropbox/file/FileReader
+@private
+*/
+define("moxie/runtime/dropbox/file/FileReader", [
+	"moxie/runtime/dropbox/Runtime",
+	"moxie/runtime/googledrive/file/FileReader"
+], function(extensions, FileReader) {
+	return (extensions.FileReader = FileReader);
+});
+
+// Included from: src/javascript/runtime/dropbox/xhr/XMLHttpRequest.js
+
+/**
+ * XMLHttpRequest.js
+ *
+ * Copyright 2013, Moxiecode Systems AB
+ * Released under GPL License.
+ *
+ * License: http://www.plupload.com/license
+ * Contributing: http://www.plupload.com/contributing
+ */
+
+/**
+@class moxie/runtime/dropbox/xhr/XMLHttpRequest
+@private
+*/
+define("moxie/runtime/dropbox/xhr/XMLHttpRequest", [
+	"moxie/runtime/dropbox/Runtime",
+	"moxie/core/utils/Basic",
+	"moxie/runtime/googledrive/xhr/XMLHttpRequest"
+], function(extensions, Basic, XMLHttpRequest) {
+	return (extensions.XMLHttpRequest = XMLHttpRequest);
+});
+
+expose(["moxie/core/utils/Basic","moxie/core/utils/Env","moxie/core/I18n","moxie/core/utils/Mime","moxie/core/utils/Dom","moxie/core/Exceptions","moxie/core/EventTarget","moxie/runtime/Runtime","moxie/runtime/RuntimeClient","moxie/file/FileInput","moxie/core/utils/Encode","moxie/file/Blob","moxie/file/File","moxie/file/FileDrop","moxie/file/FileReader","moxie/core/utils/Url","moxie/runtime/RuntimeTarget","moxie/xhr/FormData","moxie/xhr/XMLHttpRequest","moxie/image/Image","moxie/core/utils/Events","moxie/runtime/html5/image/ResizerCanvas"]);
 })(this);
 }));
