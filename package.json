@@ -70,6 +70,7 @@
     "yuidocjs": "0.3.x"
   },
   "scripts": {
-    "test": "jake test"
+    "test": "jake test",
+    "build": "jake mkjs[file/FileInput,file/FileDrop,file/FileReader,image/Image,xhr/XMLHttpRequest] runtimes=html5,googledrive,dropbox"
   }
 }
